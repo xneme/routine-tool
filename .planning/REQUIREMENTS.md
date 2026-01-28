@@ -108,39 +108,39 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAPT-01 | — | Pending |
-| CAPT-02 | — | Pending |
-| CAPT-03 | — | Pending |
-| TYPE-01 | — | Pending |
-| TYPE-02 | — | Pending |
-| TYPE-03 | — | Pending |
-| TYPE-04 | — | Pending |
-| TYPE-05 | — | Pending |
-| ORG-01 | — | Pending |
-| ORG-02 | — | Pending |
-| ORG-03 | — | Pending |
-| ORG-04 | — | Pending |
-| STRUC-01 | — | Pending |
-| STRUC-02 | — | Pending |
-| STRUC-03 | — | Pending |
-| TRAC-01 | — | Pending |
-| TRAC-02 | — | Pending |
-| TRAC-03 | — | Pending |
-| TRAC-04 | — | Pending |
-| UX-01 | — | Pending |
-| UX-02 | — | Pending |
-| UX-03 | — | Pending |
-| UX-04 | — | Pending |
-| UX-05 | — | Pending |
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
+| CAPT-01 | Phase 1 | Pending |
+| CAPT-02 | Phase 1 | Pending |
+| CAPT-03 | Phase 1 | Pending |
+| TYPE-01 | Phase 1 | Pending |
+| TYPE-02 | Phase 1 | Pending |
+| TYPE-03 | Phase 4 | Pending |
+| TYPE-04 | Phase 4 | Pending |
+| TYPE-05 | Phase 4 | Pending |
+| ORG-01 | Phase 2 | Pending |
+| ORG-02 | Phase 2 | Pending |
+| ORG-03 | Phase 2 | Pending |
+| ORG-04 | Phase 2 | Pending |
+| STRUC-01 | Phase 3 | Pending |
+| STRUC-02 | Phase 3 | Pending |
+| STRUC-03 | Phase 3 | Pending |
+| TRAC-01 | Phase 3 | Pending |
+| TRAC-02 | Phase 4 | Pending |
+| TRAC-03 | Phase 4 | Pending |
+| TRAC-04 | Phase 4 | Pending |
+| UX-01 | Phase 1 | Pending |
+| UX-02 | Phase 1 | Pending |
+| UX-03 | Phase 2 | Pending |
+| UX-04 | Phase 1 | Pending |
+| UX-05 | Phase 5 | Pending |
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 6 | Pending |
+| DATA-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 27 total
-- Mapped to phases: 0
-- Unmapped: 27 (pending roadmap creation)
+- Mapped to phases: 27
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after initial definition*
+*Last updated: 2026-01-28 after roadmap creation*
