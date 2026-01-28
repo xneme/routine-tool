@@ -31,12 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can set soft or hard deadlines on tasks without being forced to
   4. Overdue tasks can be rescheduled or dismissed without guilt messaging
   5. App displays calm, minimal task list with clean visual hierarchy
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD during planning
-- [ ] 01-02: TBD during planning
-- [ ] 01-03: TBD during planning
+- [ ] 01-01-PLAN.md — Project scaffolding + data layer (Room database, Koin DI, Material 3 theme)
+- [ ] 01-02-PLAN.md — Task list screen (expandable cards, sections, completion with haptics)
+- [ ] 01-03-PLAN.md — Add task screen + navigation + verification (progressive disclosure, full flow)
 
 ### Phase 2: Organization & Focus
 **Goal**: User can filter task views and access a curated focus list that prevents overwhelm
