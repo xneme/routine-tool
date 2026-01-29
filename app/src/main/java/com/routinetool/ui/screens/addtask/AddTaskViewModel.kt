@@ -3,13 +3,16 @@ package com.routinetool.ui.screens.addtask
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.routinetool.data.local.entities.TaskEntity
+import com.routinetool.data.preferences.PreferencesDataStore
 import com.routinetool.data.repository.TaskRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -20,9 +23,11 @@ import java.util.UUID
 /**
  * ViewModel for adding and editing tasks.
  * Handles both new task creation and existing task updates.
+ * Manages persistent expansion state for Notes and Deadlines sections.
  */
 class AddTaskViewModel(
     private val repository: TaskRepository,
+    private val preferencesDataStore: PreferencesDataStore,
     private val taskId: String? = null
 ) : ViewModel() {
 
@@ -31,6 +36,13 @@ class AddTaskViewModel(
 
     private val _savedEvent = MutableSharedFlow<Boolean>()
     val savedEvent: SharedFlow<Boolean> = _savedEvent.asSharedFlow()
+
+    // Expansion state from DataStore (persists across sessions)
+    val notesExpanded: StateFlow<Boolean> = preferencesDataStore.notesExpanded
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val deadlinesExpanded: StateFlow<Boolean> = preferencesDataStore.deadlinesExpanded
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     init {
         taskId?.let { loadTask(it) }
@@ -51,17 +63,11 @@ class AddTaskViewModel(
                 instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
             }
 
-            // Auto-expand details if any detail fields are populated
-            val hasDetails = !task.description.isNullOrBlank() ||
-                            task.softDeadline != null ||
-                            task.hardDeadline != null
-
             _uiState.value = _uiState.value.copy(
                 title = task.title,
                 description = task.description ?: "",
                 softDeadline = softDate,
                 hardDeadline = hardDate,
-                showDetails = hasDetails,
                 isEditMode = true,
                 editTaskId = id
             )
@@ -97,10 +103,21 @@ class AddTaskViewModel(
     }
 
     /**
-     * Toggle the details section visibility.
+     * Toggle the Notes section expansion and persist to DataStore.
      */
-    fun toggleDetails() {
-        _uiState.value = _uiState.value.copy(showDetails = !_uiState.value.showDetails)
+    fun toggleNotesExpanded() {
+        viewModelScope.launch {
+            preferencesDataStore.saveNotesExpanded(!notesExpanded.value)
+        }
+    }
+
+    /**
+     * Toggle the Deadlines section expansion and persist to DataStore.
+     */
+    fun toggleDeadlinesExpanded() {
+        viewModelScope.launch {
+            preferencesDataStore.saveDeadlinesExpanded(!deadlinesExpanded.value)
+        }
     }
 
     /**
@@ -168,13 +185,14 @@ class AddTaskViewModel(
 
 /**
  * UI state for the add/edit task screen.
+ * Note: Expansion state for Notes and Deadlines is managed separately via
+ * persistent StateFlows (notesExpanded, deadlinesExpanded) from DataStore.
  */
 data class AddTaskUiState(
     val title: String = "",
     val description: String = "",
     val softDeadline: LocalDate? = null,
     val hardDeadline: LocalDate? = null,
-    val showDetails: Boolean = false,
     val isSaving: Boolean = false,
     val isEditMode: Boolean = false,
     val editTaskId: String? = null
