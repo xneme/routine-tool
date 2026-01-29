@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
@@ -106,21 +107,34 @@ fun TaskCard(
                             hardDeadline = task.hardDeadline
                         )
                     }
-                    Checkbox(
-                        checked = task.isCompleted,
-                        onCheckedChange = { checked ->
-                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                            if (checked) {
-                                onComplete()
-                            } else {
+                    if (task.isCompleted) {
+                        // Bright green checkmark icon (no box) for completed tasks
+                        IconButton(
+                            onClick = {
+                                view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                                 onUncomplete()
                             }
-                        },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = MaterialTheme.colorScheme.primary,
-                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = "Completed - tap to undo",
+                                tint = Color(0xFF4CAF50),
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    } else {
+                        // Regular checkbox for incomplete tasks
+                        Checkbox(
+                            checked = false,
+                            onCheckedChange = {
+                                view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                                onComplete()
+                            },
+                            colors = CheckboxDefaults.colors(
+                                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         )
-                    )
+                    }
                 }
             }
 
