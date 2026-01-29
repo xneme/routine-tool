@@ -1,6 +1,11 @@
 package com.routinetool.ui.screens.addtask
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -8,8 +13,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,7 +35,8 @@ import org.koin.core.parameter.parametersOf
 
 /**
  * Screen for adding a new task or editing an existing one.
- * Implements progressive disclosure - details are hidden by default.
+ * Implements progressive disclosure with expandable Notes and Deadlines sections.
+ * Expansion state persists across sessions via DataStore.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +46,8 @@ fun AddTaskScreen(
     viewModel: AddTaskViewModel = koinViewModel { parametersOf(taskId) }
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val notesExpanded by viewModel.notesExpanded.collectAsState()
+    val deadlinesExpanded by viewModel.deadlinesExpanded.collectAsState()
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
@@ -88,9 +98,8 @@ fun AddTaskScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .animateContentSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Title field - always visible, auto-focused
             OutlinedTextField(
@@ -110,20 +119,12 @@ fun AddTaskScreen(
                 )
             )
 
-            // Toggle details button
-            TextButton(
-                onClick = { viewModel.toggleDetails() },
-                modifier = Modifier.fillMaxWidth()
+            // Notes section - expandable
+            ExpandableSection(
+                title = "Notes",
+                expanded = notesExpanded,
+                onToggle = { viewModel.toggleNotesExpanded() }
             ) {
-                Text(
-                    if (uiState.showDetails) "Hide details" else "Add details",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            // Details section - shown when expanded
-            if (uiState.showDetails) {
-                // Description field
                 OutlinedTextField(
                     value = uiState.description,
                     onValueChange = { viewModel.updateDescription(it) },
@@ -138,23 +139,77 @@ fun AddTaskScreen(
                         imeAction = ImeAction.Default
                     )
                 )
-
-                // Soft deadline picker
-                DeadlinePicker(
-                    label = "Reminder date",
-                    icon = Icons.Filled.Schedule,
-                    selectedDate = uiState.softDeadline,
-                    onDateSelected = { viewModel.setSoftDeadline(it) }
-                )
-
-                // Hard deadline picker
-                DeadlinePicker(
-                    label = "Due date",
-                    icon = Icons.Filled.Bookmark,
-                    selectedDate = uiState.hardDeadline,
-                    onDateSelected = { viewModel.setHardDeadline(it) }
-                )
             }
+
+            // Deadlines section - expandable
+            ExpandableSection(
+                title = "Deadlines",
+                expanded = deadlinesExpanded,
+                onToggle = { viewModel.toggleDeadlinesExpanded() }
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Soft deadline picker
+                    DeadlinePicker(
+                        label = "Reminder date",
+                        icon = Icons.Filled.Schedule,
+                        selectedDate = uiState.softDeadline,
+                        onDateSelected = { viewModel.setSoftDeadline(it) }
+                    )
+
+                    // Hard deadline picker
+                    DeadlinePicker(
+                        label = "Due date",
+                        icon = Icons.Filled.Bookmark,
+                        selectedDate = uiState.hardDeadline,
+                        onDateSelected = { viewModel.setHardDeadline(it) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Expandable section with animated visibility.
+ * Shows a header that can be tapped to expand/collapse content.
+ */
+@Composable
+private fun ExpandableSection(
+    title: String,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onToggle)
+                .padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Icon(
+                imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                contentDescription = if (expanded) "Collapse" else "Expand",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+            exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+        ) {
+            content()
         }
     }
 }
