@@ -21,6 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,11 +55,18 @@ fun TaskCard(
     val view = LocalView.current
     var isRescheduleExpanded by remember { mutableStateOf(false) }
 
-    // Determine text color based on task state
-    val textColor = when {
-        task.isCompleted -> MaterialTheme.colorScheme.onTertiaryContainer
-        isOverdue -> MaterialTheme.colorScheme.onErrorContainer
-        else -> MaterialTheme.colorScheme.onSurface
+    // Use onSurface for all text since we're using subtle custom tints
+    val textColor = MaterialTheme.colorScheme.onSurface
+
+    // Subtle custom tints over surface color
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val containerColor = when {
+        // Subtle green tint for completed tasks
+        task.isCompleted -> Color(0xFF4CAF50).copy(alpha = 0.12f).compositeOver(surfaceColor)
+        // Very subtle red tint for overdue tasks
+        isOverdue -> Color(0xFFE53935).copy(alpha = 0.08f).compositeOver(surfaceColor)
+        // Lighter surface for active tasks (more distinct from background)
+        else -> MaterialTheme.colorScheme.surfaceContainerHigh
     }
 
     ElevatedCard(
@@ -65,13 +74,7 @@ fun TaskCard(
             .fillMaxWidth()
             .animateContentSize(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = when {
-                task.isCompleted -> MaterialTheme.colorScheme.tertiaryContainer
-                isOverdue -> MaterialTheme.colorScheme.errorContainer
-                else -> MaterialTheme.colorScheme.surfaceContainerLow
-            }
-        )
+        colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         Column(
             modifier = Modifier

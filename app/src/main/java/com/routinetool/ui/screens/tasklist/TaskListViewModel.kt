@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 
 /**
  * ViewModel for the main task list screen.
@@ -33,11 +36,14 @@ class TaskListViewModel(
         repository.observeRecentlyCompleted()
     ) { activeTasks, completedTasks ->
         val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
+        // Start of today - tasks are only overdue if deadline is BEFORE today (not today itself)
+        val startOfToday = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+            .atStartOfDayIn(TimeZone.currentSystemDefault())
 
         // Split active tasks into overdue and active sections
         val (overdue, active) = activeTasks.partition { task ->
             val nearestDeadline = listOfNotNull(task.softDeadline, task.hardDeadline).minOrNull()
-            nearestDeadline != null && nearestDeadline < now
+            nearestDeadline != null && nearestDeadline < startOfToday
         }
 
         TaskListUiState(
