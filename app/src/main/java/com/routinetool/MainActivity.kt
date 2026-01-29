@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.routinetool.ui.screens.tasklist.TaskListScreen
+import com.routinetool.ui.navigation.AppNavHost
 import com.routinetool.ui.theme.RoutineToolTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,10 +19,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Temporary - navigation will be added in Plan 03
-                    TaskListScreen(
-                        onAddTask = { /* Will be wired in Plan 03 */ }
-                    )
+                    AppNavHost()
                 }
             }
         }
