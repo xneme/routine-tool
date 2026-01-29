@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 1 of 6 (Foundation & Quick Capture)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-28 — Completed 01-01-PLAN.md (Foundation & Project Setup)
+Last activity: 2026-01-29 — Completed 01-02-PLAN.md (Task List Screen)
 
-Progress: [███░░░░░░░] 33% (Phase 1: 1/3 plans)
+Progress: [██████░░░░] 67% (Phase 1: 2/3 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 6min
-- Total execution time: 0.1 hours
+- Total plans completed: 2
+- Average duration: 4min
+- Total execution time: 0.13 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-quick-capture | 1/3 | 6min | 6min |
+| 01-foundation-quick-capture | 2/3 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (6min)
-- Trend: First plan completed
+- Last 5 plans: 01-01 (6min), 01-02 (2min)
+- Trend: Accelerating (6min → 2min)
 
 *Updated after each plan completion*
 
@@ -49,6 +49,11 @@ Recent decisions affecting current work:
 - **01-01:** Deadline-proximity ordering: overdue tasks first, then nearest deadline, then no-deadline
 - **01-01:** Monochrome theme with calm accent (#5C6BC0) - no harsh red for overdue states
 - **01-01:** Room schema export enabled for future migration support
+- **01-02:** Task domain model separate from Room entity, with mappers in repository layer
+- **01-02:** UDF pattern with single StateFlow in ViewModel for task list state
+- **01-02:** Expansion state tracked locally in composable, not ViewModel (single card expanded at a time)
+- **01-02:** Long-overdue threshold set to 7 days for gentle reschedule prompts
+- **01-02:** Quick reschedule buttons: Tomorrow, +1 week, Remove deadline
 
 ### Pending Todos
 
@@ -60,6 +65,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-28T24:01:15Z
-Stopped at: Completed 01-01-PLAN.md - Android foundation ready for UI development
-Resume file: Next plan is 01-02 (Task list screen)
+Last session: 2026-01-29T00:08:28Z
+Stopped at: Completed 01-02-PLAN.md - Task list screen with expandable cards and sectioned layout
+Resume file: Next plan is 01-03 (Navigation and task entry)
