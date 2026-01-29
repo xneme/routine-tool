@@ -13,7 +13,7 @@ This roadmap delivers an Android task management app designed specifically for n
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Quick Capture** - Zero-config task capture and basic management
-- [ ] **Phase 1.1: UI Refinements** - Visual polish from user feedback (INSERTED)
+- [x] **Phase 1.1: UI Refinements** - Visual polish from user feedback (INSERTED)
 - [ ] **Phase 2: Organization & Focus** - Smart filtering and focus view to combat overwhelm
 - [ ] **Phase 3: Structure & Breakdown** - Subtasks and completion tracking
 - [ ] **Phase 4: Recurring & Time-Based Tasks** - Advanced task types for routines
@@ -57,8 +57,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01.1-01-PLAN.md — Card visual refinements (ElevatedCard, semantic tinting, checkbox repositioning, collapsible reschedule, icon colors)
-- [ ] 01.1-02-PLAN.md — List layout refinements (remove TopAppBar, section dividers, Tasks header) + visual verification
+- [x] 01.1-01-PLAN.md — Card visual refinements (ElevatedCard, semantic tinting, checkbox repositioning, collapsible reschedule, icon colors)
+- [x] 01.1-02-PLAN.md — List layout refinements (remove TopAppBar, section dividers, Tasks header) + visual verification
 
 ### Phase 2: Organization & Focus
 **Goal**: User can filter task views and access a curated focus list that prevents overwhelm
@@ -143,7 +143,7 @@ Phases execute in numeric order: 1 → 1.1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Quick Capture | 3/3 | ✓ Complete | 2026-01-29 |
-| 1.1 UI Refinements (INSERTED) | 0/2 | Not started | - |
+| 1.1 UI Refinements (INSERTED) | 2/2 | ✓ Complete | 2026-01-29 |
 | 2. Organization & Focus | 0/TBD | Not started | - |
 | 3. Structure & Breakdown | 0/TBD | Not started | - |
 | 4. Recurring & Time-Based Tasks | 0/TBD | Not started | - |
