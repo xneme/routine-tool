@@ -55,7 +55,10 @@ fun DeadlineBadge(
         Icon(
             imageVector = if (isHardDeadline) Icons.Filled.Bookmark else Icons.Filled.Schedule,
             contentDescription = if (isHardDeadline) "Hard deadline" else "Soft deadline",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = if (isHardDeadline)
+                MaterialTheme.colorScheme.secondary
+            else
+                MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
