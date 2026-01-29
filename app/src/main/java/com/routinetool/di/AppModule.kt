@@ -3,7 +3,9 @@ package com.routinetool.di
 import androidx.room.Room
 import com.routinetool.data.local.database.AppDatabase
 import com.routinetool.data.repository.TaskRepository
+import com.routinetool.ui.screens.tasklist.TaskListViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
@@ -22,5 +24,6 @@ val appModule = module {
     // Repository
     single { TaskRepository(get()) }
 
-    // ViewModels will be added in subsequent plans
+    // ViewModels
+    viewModel { TaskListViewModel(get()) }
 }
