@@ -30,6 +30,6 @@ val appModule = module {
     single { PreferencesDataStore(androidContext()) }
 
     // ViewModels
-    viewModel { TaskListViewModel(get()) }
+    viewModel { TaskListViewModel(get(), get()) }
     viewModel { params -> AddTaskViewModel(get(), params.getOrNull()) }
 }

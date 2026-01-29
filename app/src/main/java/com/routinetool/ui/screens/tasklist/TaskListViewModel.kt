@@ -2,10 +2,15 @@ package com.routinetool.ui.screens.tasklist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.routinetool.data.preferences.PreferencesDataStore
 import com.routinetool.data.repository.TaskRepository
+import com.routinetool.domain.model.FilterState
+import com.routinetool.domain.model.SortOption
 import com.routinetool.domain.model.Task
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -18,23 +23,40 @@ import kotlinx.datetime.toLocalDateTime
 /**
  * ViewModel for the main task list screen.
  * Implements Unidirectional Data Flow (UDF) pattern with single StateFlow.
+ * Supports sorting and filtering of tasks.
  */
 class TaskListViewModel(
-    private val repository: TaskRepository
+    private val repository: TaskRepository,
+    private val dataStore: PreferencesDataStore
 ) : ViewModel() {
 
     companion object {
         const val LONG_OVERDUE_DAYS = 7
     }
 
+    // Filter state - does NOT persist, resets to all-on when app restarts
+    private val _filterState = MutableStateFlow(FilterState())
+    val filterState: StateFlow<FilterState> = _filterState.asStateFlow()
+
+    // Sort preference - persists via DataStore
+    val sortOption: StateFlow<SortOption> = dataStore.sortPreference
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = SortOption.URGENCY
+        )
+
     /**
      * Combined UI state for the task list screen.
+     * Applies filtering and sorting to tasks.
      * Sections are mutually exclusive - each task appears in exactly one section.
      */
     val uiState: StateFlow<TaskListUiState> = combine(
         repository.observeActiveTasks(),
-        repository.observeRecentlyCompleted()
-    ) { activeTasks, completedTasks ->
+        repository.observeRecentlyCompleted(),
+        _filterState,
+        sortOption
+    ) { activeTasks, completedTasks, filter, sort ->
         val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
         // Start of today - tasks are only overdue if deadline is BEFORE today (not today itself)
         val startOfToday = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -46,10 +68,24 @@ class TaskListViewModel(
             nearestDeadline != null && nearestDeadline < startOfToday
         }
 
+        // Apply filters to each section
+        val filteredOverdue = overdue
+            .filter { task -> matchesFilter(task, filter, isOverdue = true, isCompleted = false) }
+            .sortedWith(sort.comparator())
+
+        val filteredActive = active
+            .filter { task -> matchesFilter(task, filter, isOverdue = false, isCompleted = false) }
+            .sortedWith(sort.comparator())
+
+        val filteredDone = completedTasks
+            .filter { task -> matchesFilter(task, filter, isOverdue = false, isCompleted = true) }
+            .sortedWith(sort.comparator())
+
         TaskListUiState(
-            overdueTasks = overdue,
-            activeTasks = active,
-            doneTasks = completedTasks,
+            overdueTasks = filteredOverdue,
+            activeTasks = filteredActive,
+            doneTasks = filteredDone,
+            currentSort = sort,
             expandedTaskId = null,
             isLoading = false
         )
@@ -60,14 +96,64 @@ class TaskListViewModel(
     )
 
     /**
+     * Check if a task matches the current filter state.
+     * Filter logic: Task passes if (status matches) AND (deadline type matches)
+     */
+    private fun matchesFilter(
+        task: Task,
+        filter: FilterState,
+        isOverdue: Boolean,
+        isCompleted: Boolean
+    ): Boolean {
+        // Check status filter
+        val statusMatches = when {
+            isCompleted -> filter.showDone
+            isOverdue -> filter.showOverdue
+            else -> filter.showActive
+        }
+        if (!statusMatches) return false
+
+        // Check deadline type filter
+        val hasSoftDeadline = task.softDeadline != null
+        val hasHardDeadline = task.hardDeadline != null
+        val hasNoDeadline = !hasSoftDeadline && !hasHardDeadline
+
+        val deadlineTypeMatches = when {
+            hasNoDeadline -> filter.showNoDeadline
+            else -> {
+                // Task may have soft, hard, or both - match if any applicable filter is on
+                (hasSoftDeadline && filter.showSoftDeadline) ||
+                (hasHardDeadline && filter.showHardDeadline)
+            }
+        }
+
+        return deadlineTypeMatches
+    }
+
+    /**
+     * Update filter state.
+     */
+    fun updateFilter(update: FilterState.() -> FilterState) {
+        _filterState.value = _filterState.value.update()
+    }
+
+    /**
+     * Set sort option and persist to DataStore.
+     */
+    fun setSortOption(option: SortOption) {
+        viewModelScope.launch {
+            dataStore.saveSortPreference(option)
+        }
+    }
+
+    /**
      * Toggle expansion state for a task card.
      * Only one task can be expanded at a time.
      */
     fun toggleExpanded(taskId: String) {
         // State update will be handled by recomposition when task card checks isExpanded
         // For now, we'll track this in a private mutable state if needed
-        // Since we're using stateless composables, expansion state can be tracked per-card
-        // This is a placeholder - expansion state is actually managed by the composable
+        // Since we're using stateless composables, expansion state is actually managed by the composable
     }
 
     /**
@@ -115,6 +201,7 @@ data class TaskListUiState(
     val overdueTasks: List<Task> = emptyList(),
     val activeTasks: List<Task> = emptyList(),
     val doneTasks: List<Task> = emptyList(),
+    val currentSort: SortOption = SortOption.URGENCY,
     val expandedTaskId: String? = null,
     val isLoading: Boolean = true
 )
