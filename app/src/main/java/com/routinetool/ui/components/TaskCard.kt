@@ -1,17 +1,25 @@
 package com.routinetool.ui.components
 
 import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,7 +31,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
-import kotlin.math.absoluteValue
 
 /**
  * Expandable task card with collapse/expand animation.
@@ -44,16 +51,25 @@ fun TaskCard(
     modifier: Modifier = Modifier
 ) {
     val view = LocalView.current
+    var isRescheduleExpanded by remember { mutableStateOf(false) }
 
-    Card(
+    // Determine text color based on task state
+    val textColor = when {
+        task.isCompleted -> MaterialTheme.colorScheme.onTertiaryContainer
+        isOverdue -> MaterialTheme.colorScheme.onErrorContainer
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
+    ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
             .animateContentSize(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (task.isCompleted) {
-                MaterialTheme.colorScheme.surfaceVariant
-            } else {
-                MaterialTheme.colorScheme.surface
+            containerColor = when {
+                task.isCompleted -> MaterialTheme.colorScheme.tertiaryContainer
+                isOverdue -> MaterialTheme.colorScheme.errorContainer
+                else -> MaterialTheme.colorScheme.surfaceContainerLow
             }
         )
     ) {
@@ -65,37 +81,42 @@ fun TaskCard(
             // Collapsed content (always visible)
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Checkbox(
-                    checked = task.isCompleted,
-                    onCheckedChange = { checked ->
-                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                        if (checked) {
-                            onComplete()
-                        } else {
-                            onUncomplete()
-                        }
-                    },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                // Left: title with weight
                 Text(
                     text = task.title,
                     style = MaterialTheme.typography.bodyLarge,
+                    color = textColor,
                     maxLines = if (isExpanded) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
                     textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                if (task.softDeadline != null || task.hardDeadline != null) {
-                    DeadlineBadge(
-                        softDeadline = task.softDeadline,
-                        hardDeadline = task.hardDeadline
+                // Right: Column with deadline badge on top, checkbox below
+                Column(horizontalAlignment = Alignment.End) {
+                    if (task.softDeadline != null || task.hardDeadline != null) {
+                        DeadlineBadge(
+                            softDeadline = task.softDeadline,
+                            hardDeadline = task.hardDeadline
+                        )
+                    }
+                    Checkbox(
+                        checked = task.isCompleted,
+                        onCheckedChange = { checked ->
+                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            if (checked) {
+                                onComplete()
+                            } else {
+                                onUncomplete()
+                            }
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primary,
+                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
                 }
             }
@@ -109,30 +130,27 @@ fun TaskCard(
                     Text(
                         text = task.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 56.dp)
+                        color = textColor.copy(alpha = 0.8f)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
                 // Deadline details
                 if (task.softDeadline != null || task.hardDeadline != null) {
-                    Column(
-                        modifier = Modifier.padding(start = 56.dp)
-                    ) {
+                    Column {
                         if (task.softDeadline != null) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Filled.Schedule,
                                     contentDescription = "Soft deadline",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = formatDeadline(task.softDeadline),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = textColor.copy(alpha = 0.8f)
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
@@ -142,14 +160,14 @@ fun TaskCard(
                                 Icon(
                                     imageVector = Icons.Filled.Bookmark,
                                     contentDescription = "Hard deadline",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    tint = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = formatDeadline(task.hardDeadline),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = textColor.copy(alpha = 0.8f)
                                 )
                             }
                         }
@@ -157,36 +175,51 @@ fun TaskCard(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                // Overdue handling
+                // Overdue handling with collapsible reschedule options
                 if (isOverdue && !task.isCompleted) {
-                    Column(
-                        modifier = Modifier.padding(start = 56.dp)
-                    ) {
+                    Column {
                         if (isLongOverdue) {
                             Text(
                                 text = "This has been waiting a while",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = textColor.copy(alpha = 0.8f),
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
 
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
-                            val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
-                            val tomorrow = today.plus(DatePeriod(days = 1))
-                            val oneWeekLater = today.plus(DatePeriod(days = 7))
+                        // Collapsible reschedule button
+                        TextButton(onClick = { isRescheduleExpanded = !isRescheduleExpanded }) {
+                            Text("Reschedule")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                imageVector = if (isRescheduleExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = if (isRescheduleExpanded) "Collapse" else "Expand"
+                            )
+                        }
 
-                            TextButton(onClick = { onReschedule(tomorrow) }) {
-                                Text("Tomorrow")
-                            }
-                            TextButton(onClick = { onReschedule(oneWeekLater) }) {
-                                Text("+1 week")
-                            }
-                            TextButton(onClick = { onDismissOverdue() }) {
-                                Text("Remove deadline")
+                        // Animated reschedule options
+                        AnimatedVisibility(
+                            visible = isRescheduleExpanded,
+                            enter = expandVertically(),
+                            exit = shrinkVertically()
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
+                                val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+                                val tomorrow = today.plus(DatePeriod(days = 1))
+                                val oneWeekLater = today.plus(DatePeriod(days = 7))
+
+                                TextButton(onClick = { onReschedule(tomorrow) }) {
+                                    Text("Tomorrow")
+                                }
+                                TextButton(onClick = { onReschedule(oneWeekLater) }) {
+                                    Text("+1 week")
+                                }
+                                TextButton(onClick = { onDismissOverdue() }) {
+                                    Text("Remove deadline")
+                                }
                             }
                         }
                     }
@@ -194,9 +227,7 @@ fun TaskCard(
                 }
 
                 // Edit button
-                Row(
-                    modifier = Modifier.padding(start = 56.dp)
-                ) {
+                Row {
                     TextButton(onClick = onEditTask) {
                         Text("Edit")
                     }
