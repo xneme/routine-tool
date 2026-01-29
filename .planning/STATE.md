@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 2 of 6 (Organization & Focus)
-Plan: 1 of 4
+Plan: 2 of 4
 Status: In progress
-Last activity: 2026-01-29 - Completed 02-01-PLAN.md (Preference Infrastructure)
+Last activity: 2026-01-29 - Completed 02-02-PLAN.md (Sorting/Filtering Implementation)
 
-Progress: [████████░░] 82% (Phases 1 + 1.1 complete, Plan 1 of Phase 2 complete)
+Progress: [████████░░] 84% (Phases 1 + 1.1 complete, Plans 1-2 of Phase 2 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 97min
-- Total execution time: 9.7 hours
+- Total plans completed: 7
+- Average duration: 85min
+- Total execution time: 9.8 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████████░░] 82% (Phases 1 + 1.1 complete, Plan 1 
 |-------|-------|-------|----------|
 | 01-foundation-quick-capture | 3/3 | 559min | 186min |
 | 01.1-ui-refinements | 2/2 | 18min | 9min |
-| 02-organization-focus | 1/4 | 2min | 2min |
+| 02-organization-focus | 2/4 | 5min | 2.5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (551min), 01.1-01 (3min), 01.1-02 (15min), 02-01 (2min)
-- Trend: Infrastructure plans executing quickly when well-scoped
+- Last 5 plans: 01.1-01 (3min), 01.1-02 (15min), 02-01 (2min), 02-02 (3min)
+- Trend: Infrastructure and UI plans executing quickly when well-scoped
 
 *Updated after each plan completion*
 
@@ -73,12 +73,16 @@ Recent decisions affecting current work:
 - **02-01:** Flow-based async access pattern for all preferences
 - **02-01:** Default focus task limit of 5 (cognitive comfort zone)
 - **02-01:** SortOption comparators handle null deadlines with MAX_VALUE
+- **02-02:** Filter state does NOT persist (resets on app restart per CONTEXT.md)
+- **02-02:** Sort preference persists via DataStore (per CONTEXT.md)
+- **02-02:** Status filters (Active/Overdue/Done) AND deadline type filters (Soft/Hard/No deadline)
+- **02-02:** Tasks with both soft+hard deadlines match if either filter is on
 
 ### Pending Todos
 
 **Phase 2 Organization & Focus** - In Progress
 - [x] Plan 01: Preference Infrastructure
-- [ ] Plan 02: Sorting/Filtering Implementation
+- [x] Plan 02: Sorting/Filtering Implementation
 - [ ] Plan 03: Focus View
 - [ ] Plan 04: Edit Progressive Disclosure
 
@@ -89,16 +93,16 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-**Phase 2 infrastructure ready:**
-- PreferencesDataStore provides Flow-based async access
-- SortOption enum has comparators for URGENCY, DEADLINE, CREATED
-- FilterState data class supports status and deadline type filtering
-- Koin registration complete for ViewModel injection
+**Sort/filter implementation complete:**
+- TaskListViewModel combines repository flows with filter/sort state
+- SortDropdown with 3 options (Urgency, Deadline, Created)
+- FilterChipRow with 6 filters (3 status + 3 deadline type)
+- Sort persists via DataStore, filters reset on app restart
 
-**Ready for Plan 02:** Sorting/filtering UI and ViewModel integration
+**Ready for Plan 03:** Focus View with hybrid task selection
 
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 02-01-PLAN.md - Preference Infrastructure
-Resume file: .planning/phases/02-organization-focus/02-02-PLAN.md
+Stopped at: Completed 02-02-PLAN.md - Sorting/Filtering Implementation
+Resume file: .planning/phases/02-organization-focus/02-03-PLAN.md
