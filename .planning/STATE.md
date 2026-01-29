@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation & Quick Capture)
-Plan: 3 of 3 complete
-Status: Phase complete ✓
-Last activity: 2026-01-29 — Completed 01-03-PLAN.md (Add Task and Navigation)
+Phase: 1.1 of 6 (UI Refinements - INSERTED)
+Plan: 1 of 2 complete
+Status: In progress
+Last activity: 2026-01-29 — Completed 01.1-01-PLAN.md (Card-Level Visual Refinements)
 
-Progress: [██████████] 100% (Phase 1: 3/3 plans)
+Progress: [██████████] 100% (Phase 1: 3/3), Phase 1.1: 1/2 plans
 
 ## Performance Metrics
 
@@ -28,10 +28,11 @@ Progress: [██████████] 100% (Phase 1: 3/3 plans)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-quick-capture | 3/3 | 559min | 186min |
+| 01.1-ui-refinements | 1/2 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (6min), 01-02 (2min), 01-03 (551min including checkpoint wait)
-- Trend: Plan 01-03 included human verification checkpoint with extended wait time
+- Last 5 plans: 01-01 (6min), 01-02 (2min), 01-03 (551min), 01.1-01 (3min)
+- Trend: UI refinement plans executing quickly - focused, well-scoped changes
 
 *Updated after each plan completion*
 
@@ -59,21 +60,30 @@ Recent decisions affecting current work:
 - **01-03:** Type-safe navigation routes with NavRoutes object and helper functions for parameterized routes
 - **01-03:** Material 3 DatePickerDialog for deadline selection, converts millis to LocalDate
 - **01-03:** Save button disabled when title is blank (only required field)
+- **01.1-01:** ElevatedCard with 2.dp elevation for visual distinction
+- **01.1-01:** Semantic container colors: errorContainer (overdue), tertiaryContainer (done), surfaceContainerLow (active)
+- **01.1-01:** Reschedule options collapsed behind expandable button (AnimatedVisibility)
+- **01.1-01:** Checkbox moved to right side for cleaner layout
+- **01.1-01:** Deadline icons use primary (soft) and secondary (hard) colors
 
 ### Pending Todos
 
 **Phase 1.1 UI Refinements** (from user feedback after Phase 1 verification):
 
-1. Cards should be visually distinct — currently list appears as one block
-2. Reduce space between unopened/collapsed tasks
-3. Better section separation — Overdue/Done blend into normal tasks
-4. Add "Tasks" header for the active tasks section (like Overdue and Done have)
-5. Move checkbox to right side, under the deadline icons
-6. Add color to icons (currently monochrome)
-7. Overdue tasks: slight red tint to differentiate from normal
-8. Done tasks: slight green tint to differentiate from normal
-9. Collapse reschedule options (Tomorrow, +1 week, Remove deadline) behind single "Reschedule" button that expands
-10. Remove "Routine Tool" header from top of app
+1. ~~Cards should be visually distinct — currently list appears as one block~~ DONE (01.1-01)
+2. Reduce space between unopened/collapsed tasks (Plan 02)
+3. Better section separation — Overdue/Done blend into normal tasks (Plan 02)
+4. Add "Tasks" header for the active tasks section (like Overdue and Done have) (Plan 02)
+5. ~~Move checkbox to right side, under the deadline icons~~ DONE (01.1-01)
+6. ~~Add color to icons (currently monochrome)~~ DONE (01.1-01)
+7. ~~Overdue tasks: slight red tint to differentiate from normal~~ DONE (01.1-01)
+8. ~~Done tasks: slight green tint to differentiate from normal~~ DONE (01.1-01)
+9. ~~Collapse reschedule options (Tomorrow, +1 week, Remove deadline) behind single "Reschedule" button that expands~~ DONE (01.1-01)
+10. Remove "Routine Tool" header from top of app (Plan 02)
+
+### Roadmap Evolution
+
+- Phase 1.1 inserted after Phase 1: UI Refinements (URGENT) - Visual polish from user feedback after Phase 1 verification
 
 ### Blockers/Concerns
 
@@ -84,5 +94,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Phase 1 complete — UI refinements identified for Phase 1.1
-Resume file: Run `/gsd:insert-phase 1` to create Phase 1.1 with UI refinements from Pending Todos above
+Stopped at: Completed 01.1-01-PLAN.md (Card-Level Visual Refinements)
+Resume file: .planning/phases/01.1-ui-refinements/01.1-02-PLAN.md
