@@ -15,7 +15,7 @@ import com.routinetool.domain.model.Task
 import com.routinetool.ui.components.TaskCard
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Main task list screen with sectioned layout.

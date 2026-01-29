@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +54,7 @@ fun DeadlineBadge(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = if (isHardDeadline) Icons.Filled.Flag else Icons.Filled.Schedule,
+            imageVector = if (isHardDeadline) Icons.Filled.Bookmark else Icons.Filled.Schedule,
             contentDescription = if (isHardDeadline) "Hard deadline" else "Soft deadline",
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )

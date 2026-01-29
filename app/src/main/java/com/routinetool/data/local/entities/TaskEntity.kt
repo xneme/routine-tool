@@ -14,6 +14,6 @@ data class TaskEntity(
     val isCompleted: Boolean = false,
     val completedAt: Long? = null,     // epoch millis
     val archivedAt: Long? = null,      // epoch millis — set 24h after completion for Done section hiding
-    val createdAt: Long = System.currentTimeMillis(),
+    val createdAt: Long = java.lang.System.currentTimeMillis(),
     val taskType: String = "ONE_TIME"  // future-proofing for Phase 4
 )

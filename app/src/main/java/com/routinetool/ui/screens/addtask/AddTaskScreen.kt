@@ -9,7 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 /**
@@ -150,7 +150,7 @@ fun AddTaskScreen(
                 // Hard deadline picker
                 DeadlinePicker(
                     label = "Due date",
-                    icon = Icons.Filled.Flag,
+                    icon = Icons.Filled.Bookmark,
                     selectedDate = uiState.hardDeadline,
                     onDateSelected = { viewModel.setHardDeadline(it) }
                 )
