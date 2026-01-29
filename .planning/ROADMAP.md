@@ -13,6 +13,7 @@ This roadmap delivers an Android task management app designed specifically for n
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Quick Capture** - Zero-config task capture and basic management
+- [ ] **Phase 1.1: UI Refinements** - Visual polish from user feedback (INSERTED)
 - [ ] **Phase 2: Organization & Focus** - Smart filtering and focus view to combat overwhelm
 - [ ] **Phase 3: Structure & Breakdown** - Subtasks and completion tracking
 - [ ] **Phase 4: Recurring & Time-Based Tasks** - Advanced task types for routines
@@ -37,6 +38,27 @@ Plans:
 - [x] 01-01-PLAN.md — Project scaffolding + data layer (Room database, Koin DI, Material 3 theme)
 - [x] 01-02-PLAN.md — Task list screen (expandable cards, sections, completion with haptics)
 - [x] 01-03-PLAN.md — Add task screen + navigation + verification (progressive disclosure, full flow)
+
+### Phase 1.1: UI Refinements (INSERTED)
+**Goal**: Polish visual hierarchy and task card presentation based on user feedback
+**Depends on**: Phase 1
+**Requirements**: UX-01 (refinement), UX-02 (refinement)
+**Success Criteria** (what must be TRUE):
+  1. Task cards are visually distinct from each other (not appearing as one block)
+  2. Collapsed tasks have reduced vertical spacing for better density
+  3. Sections (Overdue, Active, Done) are clearly separated visually
+  4. Active tasks section has a header like other sections
+  5. Checkbox positioned on right side under deadline icons
+  6. Icons have appropriate color coding (not monochrome)
+  7. Overdue tasks have subtle red tint for differentiation
+  8. Done tasks have subtle green tint for differentiation
+  9. Reschedule options collapsed behind expandable button
+  10. App header removed from top of screen
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01.1-01-PLAN.md — Card visual refinements (ElevatedCard, semantic tinting, checkbox repositioning, collapsible reschedule, icon colors)
+- [ ] 01.1-02-PLAN.md — List layout refinements (remove TopAppBar, section dividers, Tasks header) + visual verification
 
 ### Phase 2: Organization & Focus
 **Goal**: User can filter task views and access a curated focus list that prevents overwhelm
@@ -116,11 +138,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
+Phases execute in numeric order: 1 → 1.1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Quick Capture | 3/3 | ✓ Complete | 2026-01-29 |
+| 1.1 UI Refinements (INSERTED) | 0/2 | Not started | - |
 | 2. Organization & Focus | 0/TBD | Not started | - |
 | 3. Structure & Breakdown | 0/TBD | Not started | - |
 | 4. Recurring & Time-Based Tasks | 0/TBD | Not started | - |
