@@ -44,12 +44,10 @@ class AddTaskViewModel(
 
             // Convert Instant back to LocalDate for editing
             val softDate = task.softDeadline?.let { instant ->
-                kotlinx.datetime.Instant.fromEpochMilliseconds(instant.toEpochMilliseconds())
-                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
             }
             val hardDate = task.hardDeadline?.let { instant ->
-                kotlinx.datetime.Instant.fromEpochMilliseconds(instant.toEpochMilliseconds())
-                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
             }
 
             // Auto-expand details if any detail fields are populated

@@ -15,7 +15,7 @@ import com.routinetool.domain.model.Task
 import com.routinetool.ui.components.TaskCard
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Main task list screen with sectioned layout.
@@ -179,6 +179,7 @@ private fun EmptyState(modifier: Modifier = Modifier) {
 private fun isLongOverdue(task: Task): Boolean {
     val nearestDeadline = listOfNotNull(task.softDeadline, task.hardDeadline).minOrNull() ?: return false
     val now = Clock.System.now()
-    val daysOverdue = (now - nearestDeadline).inWholeDays
+    val duration = now - nearestDeadline
+    val daysOverdue = duration.inWholeDays
     return daysOverdue >= TaskListViewModel.LONG_OVERDUE_DAYS
 }

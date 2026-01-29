@@ -42,9 +42,9 @@ fun DeadlineBadge(
     val daysUntil = (deadlineDate.toEpochDays() - todayDate.toEpochDays())
 
     val text = when {
-        daysUntil == 0 -> "Today"
-        daysUntil == 1 -> "Tomorrow"
-        daysUntil == -1 -> "Yesterday"
+        daysUntil == 0L -> "Today"
+        daysUntil == 1L -> "Tomorrow"
+        daysUntil == -1L -> "Yesterday"
         daysUntil > 0 -> "In $daysUntil days"
         else -> "${daysUntil.absoluteValue} days ago"
     }
