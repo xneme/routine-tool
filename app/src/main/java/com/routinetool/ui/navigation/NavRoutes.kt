@@ -8,6 +8,7 @@ object NavRoutes {
     const val TASK_LIST = "task_list"
     const val ADD_TASK = "add_task"
     const val EDIT_TASK = "edit_task/{taskId}"
+    const val FOCUS_VIEW = "focus_view"
 
     /**
      * Build the edit task route with a specific task ID.

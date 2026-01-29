@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.routinetool.ui.screens.addtask.AddTaskScreen
+import com.routinetool.ui.screens.focus.FocusViewScreen
 import com.routinetool.ui.screens.tasklist.TaskListScreen
 
 /**
@@ -26,7 +27,8 @@ fun AppNavHost(
         composable(NavRoutes.TASK_LIST) {
             TaskListScreen(
                 onAddTask = { navController.navigate(NavRoutes.ADD_TASK) },
-                onEditTask = { taskId -> navController.navigate(NavRoutes.editTask(taskId)) }
+                onEditTask = { taskId -> navController.navigate(NavRoutes.editTask(taskId)) },
+                onNavigateToFocus = { navController.navigate(NavRoutes.FOCUS_VIEW) }
             )
         }
 
@@ -46,6 +48,13 @@ fun AppNavHost(
             AddTaskScreen(
                 onNavigateBack = { navController.popBackStack() },
                 taskId = taskId
+            )
+        }
+
+        // Focus view screen - distraction-free task view
+        composable(NavRoutes.FOCUS_VIEW) {
+            FocusViewScreen(
+                onBack = { navController.popBackStack() }
             )
         }
     }

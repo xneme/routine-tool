@@ -1,12 +1,15 @@
 package com.routinetool.ui.screens.tasklist
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.*
@@ -30,6 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 fun TaskListScreen(
     onAddTask: () -> Unit,
     onEditTask: (String) -> Unit = {},
+    onNavigateToFocus: () -> Unit = {},
     viewModel: TaskListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -38,13 +42,48 @@ fun TaskListScreen(
     // Track expanded task ID locally in the composable
     var expandedTaskId by remember { mutableStateOf<String?>(null) }
 
+    // Track FAB menu expansion state
+    var fabExpanded by remember { mutableStateOf(false) }
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddTask) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Add task"
-                )
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Secondary action: Focus View (shown when FAB expanded)
+                AnimatedVisibility(visible = fabExpanded) {
+                    SmallFloatingActionButton(
+                        onClick = {
+                            fabExpanded = false
+                            onNavigateToFocus()
+                        },
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    ) {
+                        Icon(Icons.Default.CenterFocusStrong, "Focus")
+                    }
+                }
+                // Secondary action: Add Task (shown when FAB expanded)
+                AnimatedVisibility(visible = fabExpanded) {
+                    SmallFloatingActionButton(
+                        onClick = {
+                            fabExpanded = false
+                            onAddTask()
+                        },
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    ) {
+                        Icon(Icons.Default.Add, "Add task")
+                    }
+                }
+                // Main FAB: toggles menu or directly adds task when not expanded
+                FloatingActionButton(
+                    onClick = { fabExpanded = !fabExpanded }
+                ) {
+                    Icon(
+                        imageVector = if (fabExpanded) Icons.Filled.Close else Icons.Filled.Add,
+                        contentDescription = if (fabExpanded) "Close menu" else "Open menu"
+                    )
+                }
             }
         }
     ) { paddingValues ->
