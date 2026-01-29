@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 
 /**
@@ -32,7 +32,7 @@ class TaskListViewModel(
         repository.observeActiveTasks(),
         repository.observeRecentlyCompleted()
     ) { activeTasks, completedTasks ->
-        val now = Clock.System.now()
+        val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
 
         // Split active tasks into overdue and active sections
         val (overdue, active) = activeTasks.partition { task ->

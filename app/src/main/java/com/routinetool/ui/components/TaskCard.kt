@@ -17,8 +17,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.routinetool.domain.model.Task
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.absoluteValue
@@ -172,15 +173,10 @@ fun TaskCard(
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            val tomorrow = Clock.System.now()
-                                .toLocalDateTime(TimeZone.currentSystemDefault())
-                                .date
-                                .plus(kotlinx.datetime.DatePeriod(days = 1))
-
-                            val oneWeekLater = Clock.System.now()
-                                .toLocalDateTime(TimeZone.currentSystemDefault())
-                                .date
-                                .plus(kotlinx.datetime.DatePeriod(days = 7))
+                            val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
+                            val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+                            val tomorrow = today.plus(DatePeriod(days = 1))
+                            val oneWeekLater = today.plus(DatePeriod(days = 7))
 
                             TextButton(onClick = { onReschedule(tomorrow) }) {
                                 Text("Tomorrow")

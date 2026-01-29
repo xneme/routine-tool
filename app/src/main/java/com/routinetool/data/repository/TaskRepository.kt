@@ -5,7 +5,6 @@ import com.routinetool.data.local.entities.TaskEntity
 import com.routinetool.domain.model.Task
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -18,7 +17,7 @@ class TaskRepository(private val taskDao: TaskDao) {
      * Overdue tasks appear first, followed by upcoming deadlines, then tasks with no deadline.
      */
     fun observeActiveTasks(): Flow<List<Task>> {
-        val now = Clock.System.now().toEpochMilliseconds()
+        val now = java.lang.System.currentTimeMillis()
         return taskDao.observeActiveTasks(now).map { entities ->
             entities.map { it.toDomainModel() }
         }
@@ -28,7 +27,7 @@ class TaskRepository(private val taskDao: TaskDao) {
      * Observe recently completed tasks (within last 24 hours).
      */
     fun observeRecentlyCompleted(): Flow<List<Task>> {
-        val oneDayAgo = Clock.System.now().toEpochMilliseconds() - (24 * 60 * 60 * 1000)
+        val oneDayAgo = java.lang.System.currentTimeMillis() - (24 * 60 * 60 * 1000)
         return taskDao.observeRecentlyCompleted(oneDayAgo).map { entities ->
             entities.map { it.toDomainModel() }
         }
@@ -59,7 +58,7 @@ class TaskRepository(private val taskDao: TaskDao) {
      * Mark a task as completed with current timestamp.
      */
     suspend fun completeTask(id: String) {
-        val completedAt = Clock.System.now().toEpochMilliseconds()
+        val completedAt = java.lang.System.currentTimeMillis()
         taskDao.completeTask(id, completedAt)
     }
 

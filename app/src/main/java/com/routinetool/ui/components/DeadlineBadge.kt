@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -33,8 +32,8 @@ fun DeadlineBadge(
     val nearestDeadline = listOfNotNull(softDeadline, hardDeadline).minOrNull() ?: return
     val isHardDeadline = nearestDeadline == hardDeadline
 
-    val now = Clock.System.now()
     val timeZone = TimeZone.currentSystemDefault()
+    val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
 
     val deadlineDate = nearestDeadline.toLocalDateTime(timeZone).date
     val todayDate = now.toLocalDateTime(timeZone).date

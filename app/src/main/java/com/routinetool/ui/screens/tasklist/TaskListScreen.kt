@@ -13,8 +13,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import com.routinetool.domain.model.Task
 import com.routinetool.ui.components.TaskCard
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlin.time.Duration.Companion.milliseconds
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -178,8 +179,9 @@ private fun EmptyState(modifier: Modifier = Modifier) {
  */
 private fun isLongOverdue(task: Task): Boolean {
     val nearestDeadline = listOfNotNull(task.softDeadline, task.hardDeadline).minOrNull() ?: return false
-    val now = Clock.System.now()
-    val duration = now - nearestDeadline
-    val daysOverdue = duration.inWholeDays
+    val nowMillis = java.lang.System.currentTimeMillis()
+    val deadlineMillis = nearestDeadline.toEpochMilliseconds()
+    val durationMillis = nowMillis - deadlineMillis
+    val daysOverdue = durationMillis.milliseconds.inWholeDays
     return daysOverdue >= TaskListViewModel.LONG_OVERDUE_DAYS
 }
