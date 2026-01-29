@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.routinetool.domain.model.Task
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
@@ -257,7 +257,8 @@ fun TaskCard(
 /**
  * Format an Instant as a readable date string.
  */
-private fun formatDeadline(instant: kotlinx.datetime.Instant): String {
+@Suppress("DEPRECATION")
+private fun formatDeadline(instant: Instant): String {
     val date = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
     return "${date.monthNumber}/${date.dayOfMonth}/${date.year}"
 }
