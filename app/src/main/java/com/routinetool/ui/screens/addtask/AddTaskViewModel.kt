@@ -131,18 +131,18 @@ class AddTaskViewModel(
                 )?.toEpochMilliseconds()
 
                 if (state.isEditMode && state.editTaskId != null) {
-                    // Update existing task
-                    val existingTask = repository.getById(state.editTaskId) ?: return@launch
+                    // Update existing task - fetch from DB to get entity
+                    val existingTaskDomain = repository.getById(state.editTaskId) ?: return@launch
                     val updatedEntity = TaskEntity(
                         id = state.editTaskId,
                         title = state.title,
                         description = state.description.ifBlank { null },
                         softDeadline = softDeadlineMillis,
                         hardDeadline = hardDeadlineMillis,
-                        isCompleted = existingTask.isCompleted,
-                        completedAt = existingTask.completedAt?.toEpochMilliseconds(),
-                        createdAt = existingTask.createdAt.toEpochMilliseconds(),
-                        taskType = existingTask.taskType
+                        isCompleted = existingTaskDomain.isCompleted,
+                        completedAt = existingTaskDomain.completedAt?.toEpochMilliseconds(),
+                        createdAt = existingTaskDomain.createdAt.toEpochMilliseconds(),
+                        taskType = existingTaskDomain.taskType
                     )
                     repository.update(updatedEntity)
                 } else {
