@@ -12,7 +12,7 @@ This roadmap delivers an Android task management app designed specifically for n
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Quick Capture** - Zero-config task capture and basic management
+- [x] **Phase 1: Foundation & Quick Capture** - Zero-config task capture and basic management
 - [ ] **Phase 2: Organization & Focus** - Smart filtering and focus view to combat overwhelm
 - [ ] **Phase 3: Structure & Breakdown** - Subtasks and completion tracking
 - [ ] **Phase 4: Recurring & Time-Based Tasks** - Advanced task types for routines
@@ -34,9 +34,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffolding + data layer (Room database, Koin DI, Material 3 theme)
-- [ ] 01-02-PLAN.md — Task list screen (expandable cards, sections, completion with haptics)
-- [ ] 01-03-PLAN.md — Add task screen + navigation + verification (progressive disclosure, full flow)
+- [x] 01-01-PLAN.md — Project scaffolding + data layer (Room database, Koin DI, Material 3 theme)
+- [x] 01-02-PLAN.md — Task list screen (expandable cards, sections, completion with haptics)
+- [x] 01-03-PLAN.md — Add task screen + navigation + verification (progressive disclosure, full flow)
 
 ### Phase 2: Organization & Focus
 **Goal**: User can filter task views and access a curated focus list that prevents overwhelm
@@ -120,7 +120,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Quick Capture | 0/TBD | Not started | - |
+| 1. Foundation & Quick Capture | 3/3 | ✓ Complete | 2026-01-29 |
 | 2. Organization & Focus | 0/TBD | Not started | - |
 | 3. Structure & Breakdown | 0/TBD | Not started | - |
 | 4. Recurring & Time-Based Tasks | 0/TBD | Not started | - |

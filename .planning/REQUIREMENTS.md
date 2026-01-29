@@ -9,14 +9,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Capture
 
-- [ ] **CAPT-01**: User can add a task with just a title in under 10 seconds
-- [ ] **CAPT-02**: New tasks default to uncategorized with no deadline or importance required
-- [ ] **CAPT-03**: User can add details (deadline, importance, type) to an existing task at any time
+- [x] **CAPT-01**: User can add a task with just a title in under 10 seconds *(Phase 1)*
+- [x] **CAPT-02**: New tasks default to uncategorized with no deadline or importance required *(Phase 1)*
+- [x] **CAPT-03**: User can add details (deadline, importance, type) to an existing task at any time *(Phase 1)*
 
 ### Task Types
 
-- [ ] **TYPE-01**: User can create one-time tasks that are done once and archived
-- [ ] **TYPE-02**: User can set optional soft deadline (reminder) or hard deadline (must-do) on one-time tasks
+- [x] **TYPE-01**: User can create one-time tasks that are done once and archived *(Phase 1)*
+- [x] **TYPE-02**: User can set optional soft deadline (reminder) or hard deadline (must-do) on one-time tasks *(Phase 1)*
 - [ ] **TYPE-03**: User can create recurring tasks that repeat daily, weekly, monthly, or yearly
 - [ ] **TYPE-04**: User can create quota tasks with a target count within a time period (e.g., "3x this week")
 - [ ] **TYPE-05**: User can create cooldown tasks with a minimum interval between completions (e.g., "every 8 hours")
@@ -43,15 +43,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### User Experience
 
-- [ ] **UX-01**: App uses shame-free language (no punishment for missed tasks, neutral tones)
-- [ ] **UX-02**: Overdue tasks can be easily rescheduled or dismissed without guilt messaging
+- [x] **UX-01**: App uses shame-free language (no punishment for missed tasks, neutral tones) *(Phase 1)*
+- [x] **UX-02**: Overdue tasks can be easily rescheduled or dismissed without guilt messaging *(Phase 1)*
 - [ ] **UX-03**: Task editing uses progressive disclosure (simple view, details behind expandable sections)
-- [ ] **UX-04**: Task list view is calm and minimal with clean visual hierarchy
+- [x] **UX-04**: Task list view is calm and minimal with clean visual hierarchy *(Phase 1)*
 - [ ] **UX-05**: App provides Android home screen widget showing current priority tasks
 
 ### Data
 
-- [ ] **DATA-01**: All data stored locally on device (Room/SQLite)
+- [x] **DATA-01**: All data stored locally on device (Room/SQLite) *(Phase 1)*
 - [ ] **DATA-02**: User can export all tasks to a file for backup
 - [ ] **DATA-03**: User can import tasks from a backup file
 
