@@ -62,7 +62,18 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+**Phase 1.1 UI Refinements** (from user feedback after Phase 1 verification):
+
+1. Cards should be visually distinct — currently list appears as one block
+2. Reduce space between unopened/collapsed tasks
+3. Better section separation — Overdue/Done blend into normal tasks
+4. Add "Tasks" header for the active tasks section (like Overdue and Done have)
+5. Move checkbox to right side, under the deadline icons
+6. Add color to icons (currently monochrome)
+7. Overdue tasks: slight red tint to differentiate from normal
+8. Done tasks: slight green tint to differentiate from normal
+9. Collapse reschedule options (Tomorrow, +1 week, Remove deadline) behind single "Reschedule" button that expands
+10. Remove "Routine Tool" header from top of app
 
 ### Blockers/Concerns
 
@@ -72,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-29T11:03:22Z
-Stopped at: Completed 01-03-PLAN.md - Full Phase 1 complete with human verification passed
-Resume file: Ready for Phase 2 planning (Importance-Driven Prioritization)
+Last session: 2026-01-29
+Stopped at: Phase 1 complete — UI refinements identified for Phase 1.1
+Resume file: Run `/gsd:insert-phase 1` to create Phase 1.1 with UI refinements from Pending Todos above
