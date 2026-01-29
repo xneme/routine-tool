@@ -9,12 +9,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import com.routinetool.domain.model.Task
 import com.routinetool.ui.components.TaskCard
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
 import kotlin.time.Duration.Companion.milliseconds
 import org.koin.androidx.compose.koinViewModel
 
@@ -22,7 +19,6 @@ import org.koin.androidx.compose.koinViewModel
  * Main task list screen with sectioned layout.
  * Sections: Overdue → Active → Done
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListScreen(
     onAddTask: () -> Unit,
@@ -35,14 +31,6 @@ fun TaskListScreen(
     var expandedTaskId by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Routine Tool") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddTask) {
                 Icon(
@@ -81,7 +69,7 @@ fun TaskListScreen(
                     item {
                         Text(
                             text = "Overdue",
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -102,34 +90,64 @@ fun TaskListScreen(
                             isLongOverdue = isLongOverdue(task)
                         )
                     }
-                    item { Spacer(modifier = Modifier.height(16.dp)) }
+
+                    // Divider after Overdue if there's content following
+                    if (uiState.activeTasks.isNotEmpty() || uiState.doneTasks.isNotEmpty()) {
+                        item {
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+                    }
                 }
 
-                // Active tasks section (no header - this is the default view)
-                items(uiState.activeTasks, key = { it.id }) { task ->
-                    TaskCard(
-                        task = task,
-                        isExpanded = expandedTaskId == task.id,
-                        onExpandToggle = {
-                            expandedTaskId = if (expandedTaskId == task.id) null else task.id
-                        },
-                        onComplete = { viewModel.completeTask(task.id) },
-                        onUncomplete = { viewModel.uncompleteTask(task.id) },
-                        onDismissOverdue = { viewModel.dismissOverdue(task.id) },
-                        onReschedule = { newDate -> viewModel.rescheduleTask(task.id, newDate) },
-                        onEditTask = { onEditTask(task.id) },
-                        isOverdue = false,
-                        isLongOverdue = false
-                    )
+                // Active tasks section with "Tasks" header
+                if (uiState.activeTasks.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "Tasks",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+                    items(uiState.activeTasks, key = { it.id }) { task ->
+                        TaskCard(
+                            task = task,
+                            isExpanded = expandedTaskId == task.id,
+                            onExpandToggle = {
+                                expandedTaskId = if (expandedTaskId == task.id) null else task.id
+                            },
+                            onComplete = { viewModel.completeTask(task.id) },
+                            onUncomplete = { viewModel.uncompleteTask(task.id) },
+                            onDismissOverdue = { viewModel.dismissOverdue(task.id) },
+                            onReschedule = { newDate -> viewModel.rescheduleTask(task.id, newDate) },
+                            onEditTask = { onEditTask(task.id) },
+                            isOverdue = false,
+                            isLongOverdue = false
+                        )
+                    }
+
+                    // Divider after Active if Done section follows
+                    if (uiState.doneTasks.isNotEmpty()) {
+                        item {
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+                    }
                 }
 
                 // Done section
                 if (uiState.doneTasks.isNotEmpty()) {
-                    item { Spacer(modifier = Modifier.height(16.dp)) }
                     item {
                         Text(
                             text = "Done",
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -147,8 +165,7 @@ fun TaskListScreen(
                             onReschedule = { newDate -> viewModel.rescheduleTask(task.id, newDate) },
                             onEditTask = { onEditTask(task.id) },
                             isOverdue = false,
-                            isLongOverdue = false,
-                            modifier = Modifier.alpha(0.6f)
+                            isLongOverdue = false
                         )
                     }
                 }
