@@ -6,8 +6,12 @@ import com.routinetool.data.local.entities.SubtaskEntity
 import com.routinetool.data.local.entities.TaskEntity
 import com.routinetool.domain.model.Subtask
 import com.routinetool.domain.model.Task
+import com.routinetool.domain.model.TaskWithSubtasks
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -37,6 +41,46 @@ class TaskRepository(
         val oneDayAgo = java.lang.System.currentTimeMillis() - (24 * 60 * 60 * 1000)
         return taskDao.observeRecentlyCompleted(oneDayAgo).map { entities ->
             entities.map { it.toDomainModel() }
+        }
+    }
+
+    /**
+     * Observe active (incomplete) tasks with their subtasks.
+     * Combines each task with its subtasks for display in task list.
+     */
+    fun observeActiveTasksWithSubtasks(): Flow<List<TaskWithSubtasks>> {
+        return observeActiveTasks().flatMapLatest { tasks ->
+            if (tasks.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                combine(
+                    tasks.map { task ->
+                        observeSubtasks(task.id).map { subtasks ->
+                            TaskWithSubtasks(task, subtasks)
+                        }
+                    }
+                ) { it.toList() }
+            }
+        }
+    }
+
+    /**
+     * Observe recently completed tasks with their subtasks.
+     * Combines each task with its subtasks for display in task list.
+     */
+    fun observeRecentlyCompletedWithSubtasks(): Flow<List<TaskWithSubtasks>> {
+        return observeRecentlyCompleted().flatMapLatest { tasks ->
+            if (tasks.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                combine(
+                    tasks.map { task ->
+                        observeSubtasks(task.id).map { subtasks ->
+                            TaskWithSubtasks(task, subtasks)
+                        }
+                    }
+                ) { it.toList() }
+            }
         }
     }
 

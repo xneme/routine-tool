@@ -7,6 +7,7 @@ import com.routinetool.data.repository.TaskRepository
 import com.routinetool.domain.model.FilterState
 import com.routinetool.domain.model.SortOption
 import com.routinetool.domain.model.Task
+import com.routinetool.domain.model.TaskWithSubtasks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -48,38 +49,39 @@ class TaskListViewModel(
 
     /**
      * Combined UI state for the task list screen.
-     * Applies filtering and sorting to tasks.
+     * Applies filtering and sorting to tasks with subtasks.
      * Sections are mutually exclusive - each task appears in exactly one section.
      */
     val uiState: StateFlow<TaskListUiState> = combine(
-        repository.observeActiveTasks(),
-        repository.observeRecentlyCompleted(),
+        repository.observeActiveTasksWithSubtasks(),
+        repository.observeRecentlyCompletedWithSubtasks(),
         _filterState,
         sortOption
-    ) { activeTasks, completedTasks, filter, sort ->
+    ) { activeTasksWithSubtasks, completedTasksWithSubtasks, filter, sort ->
         val now = Clock.System.now()
         // Start of today - tasks are only overdue if deadline is BEFORE today (not today itself)
         val startOfToday = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
             .atStartOfDayIn(TimeZone.currentSystemDefault())
 
         // Split active tasks into overdue and active sections
-        val (overdue, active) = activeTasks.partition { task ->
+        val (overdue, active) = activeTasksWithSubtasks.partition { taskWithSubtasks ->
+            val task = taskWithSubtasks.task
             val nearestDeadline = listOfNotNull(task.softDeadline, task.hardDeadline).minOrNull()
             nearestDeadline != null && nearestDeadline < startOfToday
         }
 
         // Apply filters to each section
         val filteredOverdue = overdue
-            .filter { task -> matchesFilter(task, filter, isOverdue = true, isCompleted = false) }
-            .sortedWith(sort.comparator())
+            .filter { taskWithSubtasks -> matchesFilter(taskWithSubtasks.task, filter, isOverdue = true, isCompleted = false) }
+            .sortedWith(compareBy(sort.comparator()) { it.task })
 
         val filteredActive = active
-            .filter { task -> matchesFilter(task, filter, isOverdue = false, isCompleted = false) }
-            .sortedWith(sort.comparator())
+            .filter { taskWithSubtasks -> matchesFilter(taskWithSubtasks.task, filter, isOverdue = false, isCompleted = false) }
+            .sortedWith(compareBy(sort.comparator()) { it.task })
 
-        val filteredDone = completedTasks
-            .filter { task -> matchesFilter(task, filter, isOverdue = false, isCompleted = true) }
-            .sortedWith(sort.comparator())
+        val filteredDone = completedTasksWithSubtasks
+            .filter { taskWithSubtasks -> matchesFilter(taskWithSubtasks.task, filter, isOverdue = false, isCompleted = true) }
+            .sortedWith(compareBy(sort.comparator()) { it.task })
 
         TaskListUiState(
             overdueTasks = filteredOverdue,
@@ -208,15 +210,24 @@ class TaskListViewModel(
             repository.rescheduleTask(taskId, newDate)
         }
     }
+
+    /**
+     * Toggle subtask completion state.
+     */
+    fun toggleSubtask(subtaskId: String) {
+        viewModelScope.launch {
+            repository.toggleSubtask(subtaskId)
+        }
+    }
 }
 
 /**
  * UI state for the task list screen.
  */
 data class TaskListUiState(
-    val overdueTasks: List<Task> = emptyList(),
-    val activeTasks: List<Task> = emptyList(),
-    val doneTasks: List<Task> = emptyList(),
+    val overdueTasks: List<TaskWithSubtasks> = emptyList(),
+    val activeTasks: List<TaskWithSubtasks> = emptyList(),
+    val doneTasks: List<TaskWithSubtasks> = emptyList(),
     val currentSort: SortOption = SortOption.URGENCY,
     val expandedTaskId: String? = null,
     val isLoading: Boolean = true
