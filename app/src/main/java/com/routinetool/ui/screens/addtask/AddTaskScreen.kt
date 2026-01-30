@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -27,16 +26,11 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -121,7 +115,6 @@ fun AddTaskScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .imePadding()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -349,7 +342,6 @@ private fun DeadlinePicker(
  * Composable for managing subtasks with reorderable list.
  * Supports both edit mode (persisted subtasks) and add mode (pending subtasks).
  */
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 private fun SubtasksList(
     subtasks: List<Subtask>,
@@ -364,18 +356,6 @@ private fun SubtasksList(
 ) {
     var newSubtaskTitle by remember { mutableStateOf("") }
     val haptic = LocalHapticFeedback.current
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val coroutineScope = rememberCoroutineScope()
-
-    // Bring input field into view when subtasks change (new one added)
-    val subtaskCount = if (isEditMode) subtasks.size else pendingSubtasks.size
-    LaunchedEffect(subtaskCount) {
-        if (subtaskCount > 0) {
-            // Wait for layout to update before scrolling
-            delay(100)
-            bringIntoViewRequester.bringIntoView()
-        }
-    }
 
     Column(
         modifier = modifier,
@@ -388,15 +368,11 @@ private fun SubtasksList(
                 onReorder(from.index, to.index)
             }
 
-            // Calculate height based on subtask count (approx 52dp per row + 4dp spacing)
-            val itemHeight = 56.dp
-            val calculatedHeight = (subtasks.size * itemHeight.value).dp
-
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(calculatedHeight),
+                    .heightIn(max = 300.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(subtasks, key = { it.id }) { subtask ->
@@ -427,7 +403,7 @@ private fun SubtasksList(
             }
         }
 
-        // Pending subtasks (add mode) - displayed inline, parent handles scrolling
+        // Pending subtasks (add mode) - displayed inline
         if (!isEditMode && pendingSubtasks.isNotEmpty()) {
             pendingSubtasks.forEachIndexed { index, title ->
                 SubtaskRow(
@@ -455,16 +431,7 @@ private fun SubtasksList(
                 }
             ),
             singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .bringIntoViewRequester(bringIntoViewRequester)
-                .onFocusEvent { focusState ->
-                    if (focusState.isFocused) {
-                        coroutineScope.launch {
-                            bringIntoViewRequester.bringIntoView()
-                        }
-                    }
-                }
+            modifier = Modifier.fillMaxWidth()
         )
 
         // Soft limit warning
