@@ -97,7 +97,11 @@ class TaskListViewModel(
 
     /**
      * Check if a task matches the current filter state.
-     * Filter logic: Task passes if (status matches) AND (deadline type matches)
+     *
+     * Filter logic:
+     * - No filters selected (isDefault) = show all tasks
+     * - Any filter selected = show only tasks matching selected filters
+     * - Status and deadline type filters are independent dimensions
      */
     private fun matchesFilter(
         task: Task,
@@ -105,29 +109,41 @@ class TaskListViewModel(
         isOverdue: Boolean,
         isCompleted: Boolean
     ): Boolean {
-        // Check status filter
-        val statusMatches = when {
-            isCompleted -> filter.showDone
-            isOverdue -> filter.showOverdue
-            else -> filter.showActive
-        }
-        if (!statusMatches) return false
+        // If no filters selected, show all tasks
+        if (filter.isDefault) return true
 
-        // Check deadline type filter
-        val hasSoftDeadline = task.softDeadline != null
-        val hasHardDeadline = task.hardDeadline != null
-        val hasNoDeadline = !hasSoftDeadline && !hasHardDeadline
-
-        val deadlineTypeMatches = when {
-            hasNoDeadline -> filter.showNoDeadline
-            else -> {
-                // Task may have soft, hard, or both - match if any applicable filter is on
-                (hasSoftDeadline && filter.showSoftDeadline) ||
-                (hasHardDeadline && filter.showHardDeadline)
+        // Check status filter (if any status filter is active)
+        val statusMatches = if (filter.hasStatusFilter) {
+            when {
+                isCompleted -> filter.showDone
+                isOverdue -> filter.showOverdue
+                else -> filter.showActive
             }
+        } else {
+            // No status filters selected = all statuses pass
+            true
         }
 
-        return deadlineTypeMatches
+        // Check deadline type filter (if any deadline filter is active)
+        val deadlineTypeMatches = if (filter.hasDeadlineFilter) {
+            val hasSoftDeadline = task.softDeadline != null
+            val hasHardDeadline = task.hardDeadline != null
+            val hasNoDeadline = !hasSoftDeadline && !hasHardDeadline
+
+            when {
+                hasNoDeadline -> filter.showNoDeadline
+                else -> {
+                    // Task may have soft, hard, or both - match if any applicable filter is on
+                    (hasSoftDeadline && filter.showSoftDeadline) ||
+                    (hasHardDeadline && filter.showHardDeadline)
+                }
+            }
+        } else {
+            // No deadline filters selected = all deadline types pass
+            true
+        }
+
+        return statusMatches && deadlineTypeMatches
     }
 
     /**

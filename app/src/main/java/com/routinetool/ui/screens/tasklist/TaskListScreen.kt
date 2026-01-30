@@ -3,14 +3,13 @@ package com.routinetool.ui.screens.tasklist
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -92,24 +91,22 @@ fun TaskListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Sort dropdown row
+            // Sort and Filter controls row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.End
             ) {
+                FilterDropdown(
+                    filterState = filterState,
+                    onFilterChange = { newFilter -> viewModel.updateFilter { newFilter } }
+                )
                 SortDropdown(
                     currentSort = uiState.currentSort,
                     onSortChange = { viewModel.setSortOption(it) }
                 )
             }
-
-            // Filter chip row
-            FilterChipRow(
-                filterState = filterState,
-                onFilterChange = { newFilter -> viewModel.updateFilter { newFilter } }
-            )
 
             // Task list content
             if (uiState.isLoading) {
@@ -279,80 +276,105 @@ private fun SortDropdown(
 }
 
 /**
- * Horizontal scrollable row of filter chips.
+ * Filter dropdown triggered by filter icon.
+ * Shows badge when filters are active.
  */
 @Composable
-private fun FilterChipRow(
+private fun FilterDropdown(
     filterState: FilterState,
     onFilterChange: (FilterState) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyRow(
-        modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Status filters
-        item {
-            FilterChip(
-                selected = filterState.showActive,
+    var expanded by remember { mutableStateOf(false) }
+    val activeCount = filterState.activeFilterCount
+
+    Box(modifier = modifier) {
+        IconButton(onClick = { expanded = true }) {
+            BadgedBox(
+                badge = {
+                    if (activeCount > 0) {
+                        Badge { Text("$activeCount") }
+                    }
+                }
+            ) {
+                Icon(Icons.Default.FilterList, contentDescription = "Filter options")
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            // Status section header
+            Text(
+                text = "Status",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+            )
+            DropdownMenuItem(
+                text = { Text("Active") },
                 onClick = { onFilterChange(filterState.copy(showActive = !filterState.showActive)) },
-                label = { Text("Active") },
                 leadingIcon = if (filterState.showActive) {
-                    { Icon(Icons.Filled.Done, contentDescription = null, Modifier.size(FilterChipDefaults.IconSize)) }
+                    { Icon(Icons.Filled.Check, contentDescription = null) }
                 } else null
             )
-        }
-        item {
-            FilterChip(
-                selected = filterState.showOverdue,
+            DropdownMenuItem(
+                text = { Text("Overdue") },
                 onClick = { onFilterChange(filterState.copy(showOverdue = !filterState.showOverdue)) },
-                label = { Text("Overdue") },
                 leadingIcon = if (filterState.showOverdue) {
-                    { Icon(Icons.Filled.Done, contentDescription = null, Modifier.size(FilterChipDefaults.IconSize)) }
+                    { Icon(Icons.Filled.Check, contentDescription = null) }
                 } else null
             )
-        }
-        item {
-            FilterChip(
-                selected = filterState.showDone,
+            DropdownMenuItem(
+                text = { Text("Done") },
                 onClick = { onFilterChange(filterState.copy(showDone = !filterState.showDone)) },
-                label = { Text("Done") },
                 leadingIcon = if (filterState.showDone) {
-                    { Icon(Icons.Filled.Done, contentDescription = null, Modifier.size(FilterChipDefaults.IconSize)) }
+                    { Icon(Icons.Filled.Check, contentDescription = null) }
                 } else null
             )
-        }
-        // Deadline type filters
-        item {
-            FilterChip(
-                selected = filterState.showSoftDeadline,
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+            // Deadline type section header
+            Text(
+                text = "Deadline Type",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+            )
+            DropdownMenuItem(
+                text = { Text("Soft deadline") },
                 onClick = { onFilterChange(filterState.copy(showSoftDeadline = !filterState.showSoftDeadline)) },
-                label = { Text("Soft") },
                 leadingIcon = if (filterState.showSoftDeadline) {
-                    { Icon(Icons.Filled.Done, contentDescription = null, Modifier.size(FilterChipDefaults.IconSize)) }
+                    { Icon(Icons.Filled.Check, contentDescription = null) }
                 } else null
             )
-        }
-        item {
-            FilterChip(
-                selected = filterState.showHardDeadline,
+            DropdownMenuItem(
+                text = { Text("Hard deadline") },
                 onClick = { onFilterChange(filterState.copy(showHardDeadline = !filterState.showHardDeadline)) },
-                label = { Text("Hard") },
                 leadingIcon = if (filterState.showHardDeadline) {
-                    { Icon(Icons.Filled.Done, contentDescription = null, Modifier.size(FilterChipDefaults.IconSize)) }
+                    { Icon(Icons.Filled.Check, contentDescription = null) }
                 } else null
             )
-        }
-        item {
-            FilterChip(
-                selected = filterState.showNoDeadline,
+            DropdownMenuItem(
+                text = { Text("No deadline") },
                 onClick = { onFilterChange(filterState.copy(showNoDeadline = !filterState.showNoDeadline)) },
-                label = { Text("No deadline") },
                 leadingIcon = if (filterState.showNoDeadline) {
-                    { Icon(Icons.Filled.Done, contentDescription = null, Modifier.size(FilterChipDefaults.IconSize)) }
+                    { Icon(Icons.Filled.Check, contentDescription = null) }
                 } else null
             )
+
+            // Clear filters option (only if filters active)
+            if (activeCount > 0) {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                DropdownMenuItem(
+                    text = { Text("Clear filters") },
+                    onClick = {
+                        onFilterChange(FilterState())
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
