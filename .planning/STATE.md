@@ -19,9 +19,9 @@ Progress: [███████████░] 94% (Phases 1 + 1.1 + 2 complet
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 56min
-- Total execution time: 10 hours 9 min
+- Total plans completed: 12
+- Average duration: 52min
+- Total execution time: 10 hours 14 min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [███████████░] 94% (Phases 1 + 1.1 + 2 complet
 | 01-foundation-quick-capture | 3/3 | 559min | 186min |
 | 01.1-ui-refinements | 2/2 | 18min | 9min |
 | 02-organization-focus | 4/4 | 11min | 2.8min |
-| 03-structure-breakdown | 3/4 | 9min | 3min |
+| 03-structure-breakdown | 3/4 | 14min | 4.7min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (3min), 02-04 (3min), 03-01 (3min), 03-03 (3min)
+- Last 5 plans: 02-04 (3min), 03-01 (3min), 03-02 (5min), 03-03 (3min)
 - Trend: Consistently fast execution with well-scoped tasks
 
 *Updated after each plan completion*
@@ -88,6 +88,13 @@ Recent decisions affecting current work:
 - **03-01:** Precision loss detection triggers full renumbering when gaps become too small (<0.0001f)
 - **03-01:** CASCADE delete on foreign key ensures subtasks deleted with parent task
 - **03-01:** Database version 2 with migration creating subtasks table
+- **03-02:** sh.calvin.reorderable library v3.0.0 for long-press drag functionality
+- **03-02:** ReorderableItem wrapper provides automatic long-press detection
+- **03-02:** Animated elevation (8dp) and shadow during drag for visual feedback
+- **03-02:** Haptic feedback: LongPress on drag start, TextHandleMove on drag end
+- **03-02:** Pending subtasks pattern: new tasks collect titles, save after task creation
+- **03-02:** Edit mode: subtasks saved immediately via repository
+- **03-02:** Soft limit warning at 20+ subtasks with helpful message
 - **03-03:** Progress indicator threshold at 6 subtasks: visual boxes below, text count above
 - **03-03:** Subtask toggle uses VIRTUAL_KEY haptic (lighter) vs task completion CONFIRM (stronger)
 - **03-03:** TaskWithSubtasks computed properties: completedSubtaskCount, totalSubtaskCount, hasSubtasks
@@ -97,7 +104,7 @@ Recent decisions affecting current work:
 
 **Phase 3 Structure & Breakdown** - IN PROGRESS
 - [x] Plan 01: Subtask Data Layer
-- [ ] Plan 02: Subtask UI Components (in progress)
+- [x] Plan 02: Subtask UI Components
 - [x] Plan 03: Subtask Progress Display
 - [ ] Plan 04: Remaining work
 
@@ -110,16 +117,16 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-**Phase 3 Plan 03 complete:**
-- Subtask progress display on task cards working
+**Phase 3 Plans 01-03 complete:**
+- Subtask data layer with fractional indexing (03-01)
+- Subtask management UI with reorderable list (03-02)
+- Subtask progress display on task cards (03-03)
 - TaskWithSubtasks aggregation pattern established
-- SubtaskProgressIndicator shows visual progress (checkbox row or count)
-- Subtask toggle from task list with lighter haptic feedback
-- Repository observes tasks with subtasks reactively
+- SubtaskProgressIndicator shows visual progress
 - No blockers for remaining Phase 3 work
 
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 03-03-PLAN.md (Subtask Progress Display)
-Resume file: Continue with remaining Phase 3 work
+Stopped at: Completed 03-02-PLAN.md (Subtask Management UI)
+Resume file: Continue with 03-04-PLAN.md or next phase work
