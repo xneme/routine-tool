@@ -87,11 +87,12 @@ Plans:
   2. User can mark individual subtasks as complete independently of the parent task
   3. User can reorder subtasks within a task to prioritize steps
   4. App records completion timestamps for every task and subtask completion
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD during planning
-- [ ] 03-02: TBD during planning
+- [ ] 03-01-PLAN.md — Data layer (SubtaskEntity, SubtaskDao, migration, repository methods)
+- [ ] 03-02-PLAN.md — Subtask management UI (edit screen section, reorderable list, soft limit)
+- [ ] 03-03-PLAN.md — Task card progress (SubtaskProgressIndicator, subtask checklist, haptics)
 
 ### Phase 4: Recurring & Time-Based Tasks
 **Goal**: User can create repeating routines with flexible tracking that reduces shame
@@ -147,7 +148,7 @@ Phases execute in numeric order: 1 → 1.1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation & Quick Capture | 3/3 | ✓ Complete | 2026-01-29 |
 | 1.1 UI Refinements (INSERTED) | 2/2 | ✓ Complete | 2026-01-29 |
 | 2. Organization & Focus | 4/4 | ✓ Complete | 2026-01-30 |
-| 3. Structure & Breakdown | 0/TBD | Not started | - |
+| 3. Structure & Breakdown | 0/3 | Not started | - |
 | 4. Recurring & Time-Based Tasks | 0/TBD | Not started | - |
 | 5. Visibility & Widget | 0/TBD | Not started | - |
 | 6. Data Portability | 0/TBD | Not started | - |
