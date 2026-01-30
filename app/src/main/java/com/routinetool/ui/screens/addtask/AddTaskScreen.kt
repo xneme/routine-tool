@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -370,6 +371,8 @@ private fun SubtasksList(
     val subtaskCount = if (isEditMode) subtasks.size else pendingSubtasks.size
     LaunchedEffect(subtaskCount) {
         if (subtaskCount > 0) {
+            // Wait for layout to update before scrolling
+            delay(100)
             bringIntoViewRequester.bringIntoView()
         }
     }
@@ -385,11 +388,15 @@ private fun SubtasksList(
                 onReorder(from.index, to.index)
             }
 
+            // Calculate height based on subtask count (approx 52dp per row + 4dp spacing)
+            val itemHeight = 56.dp
+            val calculatedHeight = (subtasks.size * itemHeight.value).dp
+
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 300.dp),
+                    .height(calculatedHeight),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(subtasks, key = { it.id }) { subtask ->
