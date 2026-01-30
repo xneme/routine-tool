@@ -59,6 +59,7 @@ class PreferencesDataStore(private val context: Context) {
     // Edit screen expansion states
     private val NOTES_EXPANDED_KEY = booleanPreferencesKey("notes_expanded")
     private val DEADLINES_EXPANDED_KEY = booleanPreferencesKey("deadlines_expanded")
+    private val SUBTASKS_EXPANDED_KEY = booleanPreferencesKey("subtasks_expanded")
 
     val notesExpanded: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[NOTES_EXPANDED_KEY] ?: false
@@ -66,6 +67,10 @@ class PreferencesDataStore(private val context: Context) {
 
     val deadlinesExpanded: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[DEADLINES_EXPANDED_KEY] ?: false
+    }
+
+    val subtasksExpanded: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[SUBTASKS_EXPANDED_KEY] ?: false
     }
 
     suspend fun saveNotesExpanded(expanded: Boolean) {
@@ -77,6 +82,12 @@ class PreferencesDataStore(private val context: Context) {
     suspend fun saveDeadlinesExpanded(expanded: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[DEADLINES_EXPANDED_KEY] = expanded
+        }
+    }
+
+    suspend fun saveSubtasksExpanded(expanded: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[SUBTASKS_EXPANDED_KEY] = expanded
         }
     }
 }

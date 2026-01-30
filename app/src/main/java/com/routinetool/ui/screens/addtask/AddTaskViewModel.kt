@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.routinetool.data.local.entities.TaskEntity
 import com.routinetool.data.preferences.PreferencesDataStore
 import com.routinetool.data.repository.TaskRepository
+import com.routinetool.domain.model.Subtask
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -44,6 +46,25 @@ class AddTaskViewModel(
     val deadlinesExpanded: StateFlow<Boolean> = preferencesDataStore.deadlinesExpanded
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val subtasksExpanded: StateFlow<Boolean> = preferencesDataStore.subtasksExpanded
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // Subtask management
+    private val _subtasks = MutableStateFlow<List<Subtask>>(emptyList())
+    val subtasks: StateFlow<List<Subtask>> = _subtasks.asStateFlow()
+
+    // For new tasks (not edit mode), collect subtask titles until task is saved
+    private val _pendingSubtasks = MutableStateFlow<List<String>>(emptyList())
+    val pendingSubtasks: StateFlow<List<String>> = _pendingSubtasks.asStateFlow()
+
+    // Show warning when subtasks count reaches 20
+    val isSubtaskLimitWarningVisible: StateFlow<Boolean> = combine(
+        subtasks,
+        pendingSubtasks
+    ) { subtasks, pending ->
+        (subtasks.size + pending.size) >= 20
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     init {
         taskId?.let { loadTask(it) }
     }
@@ -71,6 +92,11 @@ class AddTaskViewModel(
                 isEditMode = true,
                 editTaskId = id
             )
+
+            // Observe subtasks for this task
+            repository.observeSubtasks(id).collect { subtaskList ->
+                _subtasks.value = subtaskList
+            }
         }
     }
 
@@ -121,6 +147,66 @@ class AddTaskViewModel(
     }
 
     /**
+     * Toggle the Subtasks section expansion and persist to DataStore.
+     */
+    fun toggleSubtasksExpanded() {
+        viewModelScope.launch {
+            preferencesDataStore.saveSubtasksExpanded(!subtasksExpanded.value)
+        }
+    }
+
+    /**
+     * Add a subtask. In edit mode, saves immediately. In add mode, adds to pending list.
+     */
+    fun addSubtask(title: String) {
+        val trimmedTitle = title.trim()
+        if (trimmedTitle.isBlank()) return
+
+        val state = _uiState.value
+        if (state.isEditMode && state.editTaskId != null) {
+            // Edit mode: save immediately
+            viewModelScope.launch {
+                repository.addSubtask(state.editTaskId, trimmedTitle)
+            }
+        } else {
+            // Add mode: collect in pending list
+            _pendingSubtasks.value = _pendingSubtasks.value + trimmedTitle
+        }
+    }
+
+    /**
+     * Delete a subtask. Only works in edit mode.
+     */
+    fun deleteSubtask(subtaskId: String) {
+        viewModelScope.launch {
+            repository.deleteSubtask(subtaskId)
+        }
+    }
+
+    /**
+     * Reorder a subtask by moving from one index to another.
+     */
+    fun reorderSubtask(fromIndex: Int, toIndex: Int) {
+        val currentSubtasks = _subtasks.value
+        if (fromIndex < 0 || fromIndex >= currentSubtasks.size ||
+            toIndex < 0 || toIndex >= currentSubtasks.size) {
+            return
+        }
+
+        val subtaskToMove = currentSubtasks[fromIndex]
+        viewModelScope.launch {
+            repository.reorderSubtask(subtaskToMove.id, toIndex, currentSubtasks)
+        }
+    }
+
+    /**
+     * Delete a pending subtask (for new task mode only).
+     */
+    fun deletePendingSubtask(index: Int) {
+        _pendingSubtasks.value = _pendingSubtasks.value.filterIndexed { i, _ -> i != index }
+    }
+
+    /**
      * Save the task (insert new or update existing).
      * Validates that title is not blank.
      * Emits success event on completion.
@@ -163,14 +249,21 @@ class AddTaskViewModel(
                     repository.update(updatedEntity)
                 } else {
                     // Insert new task
+                    val newTaskId = UUID.randomUUID().toString()
                     val newTask = TaskEntity(
-                        id = UUID.randomUUID().toString(),
+                        id = newTaskId,
                         title = state.title,
                         description = state.description.ifBlank { null },
                         softDeadline = softDeadlineMillis,
                         hardDeadline = hardDeadlineMillis
                     )
                     repository.insert(newTask)
+
+                    // Save pending subtasks
+                    _pendingSubtasks.value.forEach { subtaskTitle ->
+                        repository.addSubtask(newTaskId, subtaskTitle)
+                    }
+                    _pendingSubtasks.value = emptyList()
                 }
 
                 _savedEvent.emit(true)
