@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.routinetool.domain.model.Task
+import com.routinetool.domain.model.TaskWithSubtasks
 import kotlinx.datetime.DatePeriod
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
@@ -37,11 +38,11 @@ import kotlinx.datetime.toLocalDateTime
 
 /**
  * Expandable task card with collapse/expand animation.
- * Supports completion, quick rescheduling, and editing.
+ * Supports completion, quick rescheduling, editing, and subtask toggle.
  */
 @Composable
 fun TaskCard(
-    task: Task,
+    taskWithSubtasks: TaskWithSubtasks,
     isExpanded: Boolean,
     onExpandToggle: () -> Unit,
     onComplete: () -> Unit,
@@ -49,10 +50,12 @@ fun TaskCard(
     onDismissOverdue: () -> Unit,
     onReschedule: (LocalDate) -> Unit,
     onEditTask: () -> Unit,
+    onToggleSubtask: (String) -> Unit,
     isOverdue: Boolean,
     isLongOverdue: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val task = taskWithSubtasks.task
     val view = LocalView.current
     var isRescheduleExpanded by remember { mutableStateOf(false) }
 
@@ -88,16 +91,24 @@ fun TaskCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left: title with weight
-                Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = textColor,
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
-                    modifier = Modifier.weight(1f)
-                )
+                // Left: title and subtask progress indicator
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = task.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = textColor,
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
+                    )
+                    if (taskWithSubtasks.hasSubtasks) {
+                        SubtaskProgressIndicator(
+                            completedCount = taskWithSubtasks.completedSubtaskCount,
+                            totalCount = taskWithSubtasks.totalSubtaskCount,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 // Right: Column with deadline badge on top, checkbox below
                 Column(horizontalAlignment = Alignment.End) {
@@ -150,6 +161,54 @@ fun TaskCard(
                         color = textColor.copy(alpha = 0.8f)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                // Subtask checklist
+                if (taskWithSubtasks.subtasks.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Subtasks",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        taskWithSubtasks.subtasks.forEach { subtask ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                if (subtask.isCompleted) {
+                                    IconButton(onClick = {
+                                        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                                        onToggleSubtask(subtask.id)
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Completed",
+                                            tint = Color(0xFF4CAF50),
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                } else {
+                                    Checkbox(
+                                        checked = false,
+                                        onCheckedChange = {
+                                            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                                            onToggleSubtask(subtask.id)
+                                        }
+                                    )
+                                }
+                                Text(
+                                    text = subtask.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = textColor
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 // Deadline details

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.routinetool.domain.model.FilterState
 import com.routinetool.domain.model.SortOption
 import com.routinetool.domain.model.Task
+import com.routinetool.domain.model.TaskWithSubtasks
 import com.routinetool.ui.components.TaskCard
 import kotlin.time.Duration.Companion.milliseconds
 import org.koin.androidx.compose.koinViewModel
@@ -139,20 +140,21 @@ fun TaskListScreen(
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
-                        items(uiState.overdueTasks, key = { it.id }) { task ->
+                        items(uiState.overdueTasks, key = { it.task.id }) { taskWithSubtasks ->
                             TaskCard(
-                                task = task,
-                                isExpanded = expandedTaskId == task.id,
+                                taskWithSubtasks = taskWithSubtasks,
+                                isExpanded = expandedTaskId == taskWithSubtasks.task.id,
                                 onExpandToggle = {
-                                    expandedTaskId = if (expandedTaskId == task.id) null else task.id
+                                    expandedTaskId = if (expandedTaskId == taskWithSubtasks.task.id) null else taskWithSubtasks.task.id
                                 },
-                                onComplete = { viewModel.completeTask(task.id) },
-                                onUncomplete = { viewModel.uncompleteTask(task.id) },
-                                onDismissOverdue = { viewModel.dismissOverdue(task.id) },
-                                onReschedule = { newDate -> viewModel.rescheduleTask(task.id, newDate) },
-                                onEditTask = { onEditTask(task.id) },
+                                onComplete = { viewModel.completeTask(taskWithSubtasks.task.id) },
+                                onUncomplete = { viewModel.uncompleteTask(taskWithSubtasks.task.id) },
+                                onDismissOverdue = { viewModel.dismissOverdue(taskWithSubtasks.task.id) },
+                                onReschedule = { newDate -> viewModel.rescheduleTask(taskWithSubtasks.task.id, newDate) },
+                                onEditTask = { onEditTask(taskWithSubtasks.task.id) },
+                                onToggleSubtask = viewModel::toggleSubtask,
                                 isOverdue = true,
-                                isLongOverdue = isLongOverdue(task)
+                                isLongOverdue = isLongOverdue(taskWithSubtasks.task)
                             )
                         }
 
@@ -178,18 +180,19 @@ fun TaskListScreen(
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
-                        items(uiState.activeTasks, key = { it.id }) { task ->
+                        items(uiState.activeTasks, key = { it.task.id }) { taskWithSubtasks ->
                             TaskCard(
-                                task = task,
-                                isExpanded = expandedTaskId == task.id,
+                                taskWithSubtasks = taskWithSubtasks,
+                                isExpanded = expandedTaskId == taskWithSubtasks.task.id,
                                 onExpandToggle = {
-                                    expandedTaskId = if (expandedTaskId == task.id) null else task.id
+                                    expandedTaskId = if (expandedTaskId == taskWithSubtasks.task.id) null else taskWithSubtasks.task.id
                                 },
-                                onComplete = { viewModel.completeTask(task.id) },
-                                onUncomplete = { viewModel.uncompleteTask(task.id) },
-                                onDismissOverdue = { viewModel.dismissOverdue(task.id) },
-                                onReschedule = { newDate -> viewModel.rescheduleTask(task.id, newDate) },
-                                onEditTask = { onEditTask(task.id) },
+                                onComplete = { viewModel.completeTask(taskWithSubtasks.task.id) },
+                                onUncomplete = { viewModel.uncompleteTask(taskWithSubtasks.task.id) },
+                                onDismissOverdue = { viewModel.dismissOverdue(taskWithSubtasks.task.id) },
+                                onReschedule = { newDate -> viewModel.rescheduleTask(taskWithSubtasks.task.id, newDate) },
+                                onEditTask = { onEditTask(taskWithSubtasks.task.id) },
+                                onToggleSubtask = viewModel::toggleSubtask,
                                 isOverdue = false,
                                 isLongOverdue = false
                             )
@@ -217,18 +220,19 @@ fun TaskListScreen(
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
-                        items(uiState.doneTasks, key = { it.id }) { task ->
+                        items(uiState.doneTasks, key = { it.task.id }) { taskWithSubtasks ->
                             TaskCard(
-                                task = task,
-                                isExpanded = expandedTaskId == task.id,
+                                taskWithSubtasks = taskWithSubtasks,
+                                isExpanded = expandedTaskId == taskWithSubtasks.task.id,
                                 onExpandToggle = {
-                                    expandedTaskId = if (expandedTaskId == task.id) null else task.id
+                                    expandedTaskId = if (expandedTaskId == taskWithSubtasks.task.id) null else taskWithSubtasks.task.id
                                 },
-                                onComplete = { viewModel.completeTask(task.id) },
-                                onUncomplete = { viewModel.uncompleteTask(task.id) },
-                                onDismissOverdue = { viewModel.dismissOverdue(task.id) },
-                                onReschedule = { newDate -> viewModel.rescheduleTask(task.id, newDate) },
-                                onEditTask = { onEditTask(task.id) },
+                                onComplete = { viewModel.completeTask(taskWithSubtasks.task.id) },
+                                onUncomplete = { viewModel.uncompleteTask(taskWithSubtasks.task.id) },
+                                onDismissOverdue = { viewModel.dismissOverdue(taskWithSubtasks.task.id) },
+                                onReschedule = { newDate -> viewModel.rescheduleTask(taskWithSubtasks.task.id, newDate) },
+                                onEditTask = { onEditTask(taskWithSubtasks.task.id) },
+                                onToggleSubtask = viewModel::toggleSubtask,
                                 isOverdue = false,
                                 isLongOverdue = false
                             )
