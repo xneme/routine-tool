@@ -1,8 +1,12 @@
 package com.routinetool.data.repository
 
+import com.routinetool.data.local.database.SubtaskDao
 import com.routinetool.data.local.database.TaskDao
+import com.routinetool.data.local.entities.SubtaskEntity
 import com.routinetool.data.local.entities.TaskEntity
+import com.routinetool.domain.model.Subtask
 import com.routinetool.domain.model.Task
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
@@ -10,7 +14,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 
-class TaskRepository(private val taskDao: TaskDao) {
+class TaskRepository(
+    private val taskDao: TaskDao,
+    private val subtaskDao: SubtaskDao
+) {
 
     /**
      * Observe active (incomplete) tasks ordered by deadline proximity.
@@ -96,6 +103,108 @@ class TaskRepository(private val taskDao: TaskDao) {
 
         taskDao.update(updated)
     }
+
+    // ========== Subtask Operations ==========
+
+    /**
+     * Observe subtasks for a specific task, ordered by position.
+     */
+    fun observeSubtasks(taskId: String): Flow<List<Subtask>> {
+        return subtaskDao.observeSubtasksByTaskId(taskId).map { entities ->
+            entities.map { it.toDomainModel() }
+        }
+    }
+
+    /**
+     * Add a new subtask to a task. Automatically assigns the next position.
+     */
+    suspend fun addSubtask(taskId: String, title: String) {
+        val existingSubtasks = subtaskDao.getSubtasksByTaskId(taskId)
+        val nextPosition = if (existingSubtasks.isEmpty()) {
+            0f
+        } else {
+            existingSubtasks.maxOf { it.position } + 1f
+        }
+
+        val subtask = SubtaskEntity(
+            id = UUID.randomUUID().toString(),
+            taskId = taskId,
+            title = title,
+            position = nextPosition
+        )
+        subtaskDao.insert(subtask)
+    }
+
+    /**
+     * Toggle subtask completion state.
+     * If completed, mark as incomplete. If incomplete, mark as complete with current timestamp.
+     */
+    suspend fun toggleSubtask(subtaskId: String) {
+        val subtask = subtaskDao.getById(subtaskId) ?: return
+
+        if (subtask.isCompleted) {
+            subtaskDao.uncompleteSubtask(subtaskId)
+        } else {
+            val completedAt = java.lang.System.currentTimeMillis()
+            subtaskDao.completeSubtask(subtaskId, completedAt)
+        }
+    }
+
+    /**
+     * Delete a subtask.
+     */
+    suspend fun deleteSubtask(subtaskId: String) {
+        val subtask = subtaskDao.getById(subtaskId) ?: return
+        subtaskDao.delete(subtask)
+    }
+
+    /**
+     * Reorder a subtask using fractional indexing.
+     * Calculates new position based on surrounding subtasks and handles precision loss.
+     */
+    suspend fun reorderSubtask(subtaskId: String, newIndex: Int, allSubtasks: List<Subtask>) {
+        if (newIndex < 0 || newIndex >= allSubtasks.size) return
+
+        val newPosition = when {
+            // Moving to first position
+            newIndex == 0 -> {
+                if (allSubtasks.isEmpty()) 0f
+                else allSubtasks.first().position - 1f
+            }
+            // Moving to last position
+            newIndex >= allSubtasks.size - 1 -> {
+                allSubtasks.last().position + 1f
+            }
+            // Moving to middle position (fractional indexing)
+            else -> {
+                val prevPosition = allSubtasks[newIndex - 1].position
+                val nextPosition = allSubtasks[newIndex].position
+                val calculatedPosition = (prevPosition + nextPosition) / 2f
+
+                // Check for precision loss (gap too small)
+                if (nextPosition - prevPosition < 0.0001f) {
+                    // Need to renumber all subtasks
+                    renumberSubtasks(allSubtasks)
+                    // After renumbering, use simple calculation
+                    newIndex.toFloat()
+                } else {
+                    calculatedPosition
+                }
+            }
+        }
+
+        subtaskDao.updatePosition(subtaskId, newPosition)
+    }
+
+    /**
+     * Renumber all subtasks with integer positions when precision is lost.
+     * Private helper for reorderSubtask.
+     */
+    private suspend fun renumberSubtasks(subtasks: List<Subtask>) {
+        subtasks.forEachIndexed { index, subtask ->
+            subtaskDao.updatePosition(subtask.id, index.toFloat())
+        }
+    }
 }
 
 /**
@@ -111,4 +220,30 @@ private fun TaskEntity.toDomainModel(): Task = Task(
     completedAt = completedAt?.let { Instant.fromEpochMilliseconds(it) },
     createdAt = Instant.fromEpochMilliseconds(createdAt),
     taskType = taskType
+)
+
+/**
+ * Extension function to convert SubtaskEntity (epoch millis) to Subtask (Instant).
+ */
+private fun SubtaskEntity.toDomainModel(): Subtask = Subtask(
+    id = id,
+    taskId = taskId,
+    title = title,
+    isCompleted = isCompleted,
+    completedAt = completedAt?.let { Instant.fromEpochMilliseconds(it) },
+    position = position,
+    createdAt = Instant.fromEpochMilliseconds(createdAt)
+)
+
+/**
+ * Extension function to convert Subtask (Instant) to SubtaskEntity (epoch millis).
+ */
+private fun Subtask.toEntity(): SubtaskEntity = SubtaskEntity(
+    id = id,
+    taskId = taskId,
+    title = title,
+    isCompleted = isCompleted,
+    completedAt = completedAt?.toEpochMilliseconds(),
+    position = position,
+    createdAt = createdAt.toEpochMilliseconds()
 )

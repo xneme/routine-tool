@@ -29,7 +29,7 @@ val appModule = module {
     single { get<AppDatabase>().subtaskDao() }
 
     // Repository
-    single { TaskRepository(get()) }
+    single { TaskRepository(get(), get()) }
 
     // Preferences DataStore
     single { PreferencesDataStore(androidContext()) }
