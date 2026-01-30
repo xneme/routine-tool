@@ -407,7 +407,18 @@ private fun SubtasksList(
 
         // Pending subtasks (add mode) - not reorderable yet
         if (!isEditMode && pendingSubtasks.isNotEmpty()) {
+            val pendingListScrollState = rememberScrollState()
+
+            // Auto-scroll to bottom when new subtask added
+            LaunchedEffect(pendingSubtasks.size) {
+                pendingListScrollState.animateScrollTo(pendingListScrollState.maxValue)
+            }
+
             Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 300.dp)
+                    .verticalScroll(pendingListScrollState),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 pendingSubtasks.forEachIndexed { index, title ->
