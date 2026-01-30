@@ -76,6 +76,9 @@ dependencies {
     // Kotlinx
     implementation(libs.kotlinx.datetime)
 
+    // Reorderable
+    implementation(libs.reorderable)
+
     // Lifecycle
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
