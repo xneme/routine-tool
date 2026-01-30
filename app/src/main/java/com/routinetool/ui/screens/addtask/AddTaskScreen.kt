@@ -1,13 +1,18 @@
 package com.routinetool.ui.screens.addtask
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
@@ -22,16 +28,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.routinetool.domain.model.Subtask
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.ReorderableLazyListState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /**
  * Screen for adding a new task or editing an existing one.
@@ -48,6 +61,10 @@ fun AddTaskScreen(
     val uiState by viewModel.uiState.collectAsState()
     val notesExpanded by viewModel.notesExpanded.collectAsState()
     val deadlinesExpanded by viewModel.deadlinesExpanded.collectAsState()
+    val subtasksExpanded by viewModel.subtasksExpanded.collectAsState()
+    val subtasks by viewModel.subtasks.collectAsState()
+    val pendingSubtasks by viewModel.pendingSubtasks.collectAsState()
+    val showSubtaskLimitWarning by viewModel.isSubtaskLimitWarningVisible.collectAsState()
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
@@ -166,6 +183,24 @@ fun AddTaskScreen(
                         onDateSelected = { viewModel.setHardDeadline(it) }
                     )
                 }
+            }
+
+            // Subtasks section - expandable with reorderable list
+            ExpandableSection(
+                title = "Subtasks",
+                expanded = subtasksExpanded,
+                onToggle = { viewModel.toggleSubtasksExpanded() }
+            ) {
+                SubtasksList(
+                    subtasks = subtasks,
+                    pendingSubtasks = pendingSubtasks,
+                    isEditMode = uiState.isEditMode,
+                    onAddSubtask = { viewModel.addSubtask(it) },
+                    onDeleteSubtask = { viewModel.deleteSubtask(it) },
+                    onDeletePendingSubtask = { viewModel.deletePendingSubtask(it) },
+                    onReorder = { from, to -> viewModel.reorderSubtask(from, to) },
+                    showLimitWarning = showSubtaskLimitWarning
+                )
             }
         }
     }
@@ -299,6 +334,164 @@ private fun DeadlinePicker(
             }
         ) {
             DatePicker(state = datePickerState)
+        }
+    }
+}
+
+/**
+ * Composable for managing subtasks with reorderable list.
+ * Supports both edit mode (persisted subtasks) and add mode (pending subtasks).
+ */
+@Composable
+private fun SubtasksList(
+    subtasks: List<Subtask>,
+    pendingSubtasks: List<String>,
+    isEditMode: Boolean,
+    onAddSubtask: (String) -> Unit,
+    onDeleteSubtask: (String) -> Unit,
+    onDeletePendingSubtask: (Int) -> Unit,
+    onReorder: (Int, Int) -> Unit,
+    showLimitWarning: Boolean,
+    modifier: Modifier = Modifier
+) {
+    var newSubtaskTitle by remember { mutableStateOf("") }
+    val haptic = LocalHapticFeedback.current
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Existing subtasks (edit mode) - reorderable
+        if (isEditMode && subtasks.isNotEmpty()) {
+            val lazyListState = rememberLazyListState()
+            val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+                onReorder(from.index, to.index)
+            }
+
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 300.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(subtasks, key = { it.id }) { subtask ->
+                    ReorderableItem(reorderableState, key = subtask.id) { isDragging ->
+                        val elevation by animateDpAsState(
+                            targetValue = if (isDragging) 8.dp else 0.dp,
+                            label = "elevation"
+                        )
+
+                        // Haptic feedback on drag start/end
+                        LaunchedEffect(isDragging) {
+                            if (isDragging) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            } else {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            }
+                        }
+
+                        SubtaskRow(
+                            title = subtask.title,
+                            isCompleted = subtask.isCompleted,
+                            onDelete = { onDeleteSubtask(subtask.id) },
+                            reorderableState = reorderableState,
+                            modifier = Modifier.shadow(elevation, RoundedCornerShape(4.dp))
+                        )
+                    }
+                }
+            }
+        }
+
+        // Pending subtasks (add mode) - not reorderable yet
+        if (!isEditMode && pendingSubtasks.isNotEmpty()) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                pendingSubtasks.forEachIndexed { index, title ->
+                    SubtaskRow(
+                        title = title,
+                        isCompleted = false,
+                        onDelete = { onDeletePendingSubtask(index) },
+                        reorderableState = null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+
+        // Add new subtask field
+        OutlinedTextField(
+            value = newSubtaskTitle,
+            onValueChange = { newSubtaskTitle = it },
+            placeholder = { Text("Add subtask") },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (newSubtaskTitle.isNotBlank()) {
+                        onAddSubtask(newSubtaskTitle.trim())
+                        newSubtaskTitle = ""
+                    }
+                }
+            ),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Soft limit warning
+        if (showLimitWarning) {
+            Text(
+                text = "This task has many steps. Consider breaking it into separate tasks for better focus.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+/**
+ * Row displaying a single subtask with delete button.
+ * When reorderableState is provided, the entire row is draggable via long-press.
+ */
+@Composable
+private fun SubtaskRow(
+    title: String,
+    isCompleted: Boolean,
+    onDelete: () -> Unit,
+    reorderableState: ReorderableLazyListState?,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Checkbox for visual indication (not interactive here)
+            Checkbox(
+                checked = isCompleted,
+                onCheckedChange = null,
+                enabled = false
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        IconButton(onClick = onDelete) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete subtask",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
