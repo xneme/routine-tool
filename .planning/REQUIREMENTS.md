@@ -30,13 +30,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Structure
 
-- [ ] **STRUC-01**: User can add subtasks to any task
-- [ ] **STRUC-02**: User can mark individual subtasks as complete independently
-- [ ] **STRUC-03**: User can reorder subtasks within a task
+- [x] **STRUC-01**: User can add subtasks to any task *(Phase 3)*
+- [x] **STRUC-02**: User can mark individual subtasks as complete independently *(Phase 3)*
+- [x] **STRUC-03**: User can reorder subtasks within a task *(Phase 3)*
 
 ### Tracking
 
-- [ ] **TRAC-01**: App records completion timestamps for all task and subtask completions
+- [x] **TRAC-01**: App records completion timestamps for all task and subtask completions *(Phase 3)*
 - [ ] **TRAC-02**: User can view completion history for repeating tasks (when each instance was completed)
 - [ ] **TRAC-03**: Quota tasks show visual progress toward target (e.g., "2 of 3 this week")
 - [ ] **TRAC-04**: Cooldown tasks show countdown timer until next available completion
@@ -120,10 +120,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORG-02 | Phase 2 | Complete |
 | ORG-03 | Phase 2 | Complete |
 | ORG-04 | Phase 2 | Complete |
-| STRUC-01 | Phase 3 | Pending |
-| STRUC-02 | Phase 3 | Pending |
-| STRUC-03 | Phase 3 | Pending |
-| TRAC-01 | Phase 3 | Pending |
+| STRUC-01 | Phase 3 | Complete |
+| STRUC-02 | Phase 3 | Complete |
+| STRUC-03 | Phase 3 | Complete |
+| TRAC-01 | Phase 3 | Complete |
 | TRAC-02 | Phase 4 | Pending |
 | TRAC-03 | Phase 4 | Pending |
 | TRAC-04 | Phase 4 | Pending |
@@ -143,4 +143,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-30 after Phase 2 completion*
+*Last updated: 2026-01-30 after Phase 3 completion*

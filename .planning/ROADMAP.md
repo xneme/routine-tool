@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Quick Capture** - Zero-config task capture and basic management
 - [x] **Phase 1.1: UI Refinements** - Visual polish from user feedback (INSERTED)
 - [x] **Phase 2: Organization & Focus** - Smart filtering and focus view to combat overwhelm
-- [ ] **Phase 3: Structure & Breakdown** - Subtasks and completion tracking
+- [x] **Phase 3: Structure & Breakdown** - Subtasks and completion tracking
 - [ ] **Phase 4: Recurring & Time-Based Tasks** - Advanced task types for routines
 - [ ] **Phase 5: Visibility & Widget** - Home screen presence for object permanence
 - [ ] **Phase 6: Data Portability** - Export and import for backup
@@ -90,9 +90,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Data layer (SubtaskEntity, SubtaskDao, migration, repository methods)
-- [ ] 03-02-PLAN.md — Subtask management UI (edit screen section, reorderable list, soft limit)
-- [ ] 03-03-PLAN.md — Task card progress (SubtaskProgressIndicator, subtask checklist, haptics)
+- [x] 03-01-PLAN.md — Data layer (SubtaskEntity, SubtaskDao, migration, repository methods)
+- [x] 03-02-PLAN.md — Subtask management UI (edit screen section, reorderable list, soft limit)
+- [x] 03-03-PLAN.md — Task card progress (SubtaskProgressIndicator, subtask checklist, haptics)
 
 ### Phase 4: Recurring & Time-Based Tasks
 **Goal**: User can create repeating routines with flexible tracking that reduces shame
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 → 1.1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation & Quick Capture | 3/3 | ✓ Complete | 2026-01-29 |
 | 1.1 UI Refinements (INSERTED) | 2/2 | ✓ Complete | 2026-01-29 |
 | 2. Organization & Focus | 4/4 | ✓ Complete | 2026-01-30 |
-| 3. Structure & Breakdown | 0/3 | Not started | - |
+| 3. Structure & Breakdown | 3/3 | ✓ Complete | 2026-01-30 |
 | 4. Recurring & Time-Based Tasks | 0/TBD | Not started | - |
 | 5. Visibility & Widget | 0/TBD | Not started | - |
 | 6. Data Portability | 0/TBD | Not started | - |
