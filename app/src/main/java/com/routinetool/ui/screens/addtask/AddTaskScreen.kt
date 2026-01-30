@@ -27,11 +27,15 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -344,6 +348,7 @@ private fun DeadlinePicker(
  * Composable for managing subtasks with reorderable list.
  * Supports both edit mode (persisted subtasks) and add mode (pending subtasks).
  */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 private fun SubtasksList(
     subtasks: List<Subtask>,
@@ -358,6 +363,16 @@ private fun SubtasksList(
 ) {
     var newSubtaskTitle by remember { mutableStateOf("") }
     val haptic = LocalHapticFeedback.current
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Bring input field into view when subtasks change (new one added)
+    val subtaskCount = if (isEditMode) subtasks.size else pendingSubtasks.size
+    LaunchedEffect(subtaskCount) {
+        if (subtaskCount > 0) {
+            bringIntoViewRequester.bringIntoView()
+        }
+    }
 
     Column(
         modifier = modifier,
@@ -405,31 +420,16 @@ private fun SubtasksList(
             }
         }
 
-        // Pending subtasks (add mode) - not reorderable yet
+        // Pending subtasks (add mode) - displayed inline, parent handles scrolling
         if (!isEditMode && pendingSubtasks.isNotEmpty()) {
-            val pendingListScrollState = rememberScrollState()
-
-            // Auto-scroll to bottom when new subtask added
-            LaunchedEffect(pendingSubtasks.size) {
-                pendingListScrollState.animateScrollTo(pendingListScrollState.maxValue)
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 300.dp)
-                    .verticalScroll(pendingListScrollState),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                pendingSubtasks.forEachIndexed { index, title ->
-                    SubtaskRow(
-                        title = title,
-                        isCompleted = false,
-                        onDelete = { onDeletePendingSubtask(index) },
-                        reorderableState = null,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+            pendingSubtasks.forEachIndexed { index, title ->
+                SubtaskRow(
+                    title = title,
+                    isCompleted = false,
+                    onDelete = { onDeletePendingSubtask(index) },
+                    reorderableState = null,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
 
@@ -448,7 +448,16 @@ private fun SubtasksList(
                 }
             ),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .bringIntoViewRequester(bringIntoViewRequester)
+                .onFocusEvent { focusState ->
+                    if (focusState.isFocused) {
+                        coroutineScope.launch {
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+                }
         )
 
         // Soft limit warning
