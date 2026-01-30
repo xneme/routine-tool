@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Quick Capture** - Zero-config task capture and basic management
 - [x] **Phase 1.1: UI Refinements** - Visual polish from user feedback (INSERTED)
-- [ ] **Phase 2: Organization & Focus** - Smart filtering and focus view to combat overwhelm
+- [x] **Phase 2: Organization & Focus** - Smart filtering and focus view to combat overwhelm
 - [ ] **Phase 3: Structure & Breakdown** - Subtasks and completion tracking
 - [ ] **Phase 4: Recurring & Time-Based Tasks** - Advanced task types for routines
 - [ ] **Phase 5: Visibility & Widget** - Home screen presence for object permanence
@@ -70,11 +70,13 @@ Plans:
   3. User can access a focus view showing a limited set of priority tasks
   4. User can adjust the number of tasks shown in focus view
   5. Task editing reveals additional details through expandable sections rather than cluttered forms
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: TBD during planning
-- [ ] 02-02: TBD during planning
+- [x] 02-01-PLAN.md — Preference infrastructure (DataStore, SortOption, FilterState)
+- [x] 02-02-PLAN.md — Sorting and filtering UI (sort dropdown, filter chips)
+- [x] 02-03-PLAN.md — Focus View (hybrid task selection, pin/unpin, task limit)
+- [x] 02-04-PLAN.md — Edit progressive disclosure (expandable sections)
 
 ### Phase 3: Structure & Breakdown
 **Goal**: User can break down overwhelming tasks into manageable subtasks and track completion
@@ -144,7 +146,7 @@ Phases execute in numeric order: 1 → 1.1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Foundation & Quick Capture | 3/3 | ✓ Complete | 2026-01-29 |
 | 1.1 UI Refinements (INSERTED) | 2/2 | ✓ Complete | 2026-01-29 |
-| 2. Organization & Focus | 0/TBD | Not started | - |
+| 2. Organization & Focus | 4/4 | ✓ Complete | 2026-01-30 |
 | 3. Structure & Breakdown | 0/TBD | Not started | - |
 | 4. Recurring & Time-Based Tasks | 0/TBD | Not started | - |
 | 5. Visibility & Widget | 0/TBD | Not started | - |

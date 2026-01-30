@@ -23,10 +23,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Organization
 
-- [ ] **ORG-01**: User can sort tasks by urgency, deadline proximity, or creation date
-- [ ] **ORG-02**: User can filter tasks by type (one-time, recurring, quota, cooldown)
-- [ ] **ORG-03**: App provides focus view showing a limited, smart-suggested set of priority tasks
-- [ ] **ORG-04**: User can adjust how many tasks the focus view shows
+- [x] **ORG-01**: User can sort tasks by urgency, deadline proximity, or creation date *(Phase 2)*
+- [x] **ORG-02**: User can filter tasks by type (one-time, recurring, quota, cooldown) *(Phase 2)*
+- [x] **ORG-03**: App provides focus view showing a limited, smart-suggested set of priority tasks *(Phase 2)*
+- [x] **ORG-04**: User can adjust how many tasks the focus view shows *(Phase 2)*
 
 ### Structure
 
@@ -45,7 +45,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **UX-01**: App uses shame-free language (no punishment for missed tasks, neutral tones) *(Phase 1)*
 - [x] **UX-02**: Overdue tasks can be easily rescheduled or dismissed without guilt messaging *(Phase 1)*
-- [ ] **UX-03**: Task editing uses progressive disclosure (simple view, details behind expandable sections)
+- [x] **UX-03**: Task editing uses progressive disclosure (simple view, details behind expandable sections) *(Phase 2)*
 - [x] **UX-04**: Task list view is calm and minimal with clean visual hierarchy *(Phase 1)*
 - [ ] **UX-05**: App provides Android home screen widget showing current priority tasks
 
@@ -116,10 +116,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-03 | Phase 4 | Pending |
 | TYPE-04 | Phase 4 | Pending |
 | TYPE-05 | Phase 4 | Pending |
-| ORG-01 | Phase 2 | Pending |
-| ORG-02 | Phase 2 | Pending |
-| ORG-03 | Phase 2 | Pending |
-| ORG-04 | Phase 2 | Pending |
+| ORG-01 | Phase 2 | Complete |
+| ORG-02 | Phase 2 | Complete |
+| ORG-03 | Phase 2 | Complete |
+| ORG-04 | Phase 2 | Complete |
 | STRUC-01 | Phase 3 | Pending |
 | STRUC-02 | Phase 3 | Pending |
 | STRUC-03 | Phase 3 | Pending |
@@ -129,7 +129,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRAC-04 | Phase 4 | Pending |
 | UX-01 | Phase 1 | Pending |
 | UX-02 | Phase 1 | Pending |
-| UX-03 | Phase 2 | Pending |
+| UX-03 | Phase 2 | Complete |
 | UX-04 | Phase 1 | Pending |
 | UX-05 | Phase 5 | Pending |
 | DATA-01 | Phase 1 | Pending |
@@ -143,4 +143,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after roadmap creation*
+*Last updated: 2026-01-30 after Phase 2 completion*
