@@ -10,7 +10,7 @@ import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -253,7 +253,7 @@ private fun SortDropdown(
 
     Box(modifier = modifier) {
         IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Default.Sort, contentDescription = "Sort options")
+            Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort options")
         }
         DropdownMenu(
             expanded = expanded,

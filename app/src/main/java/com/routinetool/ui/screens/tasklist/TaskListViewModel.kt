@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -57,7 +57,7 @@ class TaskListViewModel(
         _filterState,
         sortOption
     ) { activeTasks, completedTasks, filter, sort ->
-        val now = Instant.fromEpochMilliseconds(java.lang.System.currentTimeMillis())
+        val now = Clock.System.now()
         // Start of today - tasks are only overdue if deadline is BEFORE today (not today itself)
         val startOfToday = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
             .atStartOfDayIn(TimeZone.currentSystemDefault())
