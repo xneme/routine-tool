@@ -22,3 +22,8 @@ local.properties
 
 # Kotlin
 *.hprof
+
+# AI settings
+.claude/
+.gemini/
+.opencode/
