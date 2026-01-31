@@ -403,16 +403,20 @@ private fun SubtasksList(
             }
         }
 
-        // Pending subtasks (add mode) - displayed inline
+        // Pending subtasks (add mode) - not reorderable yet
         if (!isEditMode && pendingSubtasks.isNotEmpty()) {
-            pendingSubtasks.forEachIndexed { index, title ->
-                SubtaskRow(
-                    title = title,
-                    isCompleted = false,
-                    onDelete = { onDeletePendingSubtask(index) },
-                    reorderableState = null,
-                    modifier = Modifier.fillMaxWidth()
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                pendingSubtasks.forEachIndexed { index, title ->
+                    SubtaskRow(
+                        title = title,
+                        isCompleted = false,
+                        onDelete = { onDeletePendingSubtask(index) },
+                        reorderableState = null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
 
